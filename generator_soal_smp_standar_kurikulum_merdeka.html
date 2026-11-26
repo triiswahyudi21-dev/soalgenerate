@@ -1,0 +1,3752 @@
+<!DOCTYPE html>
+<html lang="id"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator Soal SMP — Standar Kurikulum Merdeka</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Font Arab berharakat jelas untuk PAI */
+    .arabic-text {
+      font-family: 'Amiri', 'Traditional Arabic', 'Scheherazade New', serif;
+      direction: rtl;
+      unicode-bidi: isolate;
+      font-size: 1.45rem;
+      line-height: 2.35;
+      text-align: right;
+    }
+
+    /* Styling kertas naskah ujian A4 */
+    .exam-paper {
+      font-family: 'Times New Roman', Times, serif;
+      color: #0f172a;
+      line-height: 1.5;
+    }
+
+    .exam-paper .ui-badge,
+    .exam-paper .no-print {
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Tabel kop & identitas presisi (layar & Word) */
+    .kop-header-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      border-bottom: 3px double #0f172a;
+      margin-bottom: 10px;
+    }
+
+    .kop-header-table td {
+      vertical-align: middle;
+      padding-bottom: 8px;
+    }
+
+    .identitas-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 11pt;
+      margin-bottom: 12px;
+      border-bottom: 1.5px solid #0f172a;
+    }
+
+    .identitas-table td {
+      padding: 2.5px 2px;
+      vertical-align: top;
+    }
+
+    /* Tabel nomor & butir soal sejajar lurus */
+    .soal-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin-bottom: 10px;
+    }
+
+    .soal-table td {
+      vertical-align: top;
+      padding: 1.5px 0;
+    }
+
+    .opsi-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin-top: 3px;
+    }
+
+    .opsi-table td {
+      vertical-align: top;
+      padding: 1.5px 0;
+    }
+
+    /* Tabel pernyataan Benar/Salah & Menjodohkan sejajar persis dengan lebar soal */
+    .akm-grid-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin-top: 6px;
+      font-size: 10.5pt;
+    }
+
+    .akm-grid-table th,
+    .akm-grid-table td {
+      border: 1px solid #334155;
+      padding: 5px 7px;
+      vertical-align: top;
+    }
+
+    .akm-grid-table th {
+      background-color: #f1f5f9;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .pernyataan-inner-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .pernyataan-inner-table td {
+      border: none !important;
+      padding: 0 !important;
+      vertical-align: top;
+    }
+
+    /* Pengaturan cetak A4 */
+    @page {
+      size: A4 portrait;
+      margin: 15mm 18mm 15mm 18mm;
+    }
+
+    @media print {
+      html, body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      main, .grid {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .print-full-width {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      #document-container {
+        display: block !important;
+        width: 100% !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .page-break-before {
+        page-break-before: always;
+        break-before: page;
+      }
+      .soal-block {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- HEADER UTAMA -->
+  <header class="no-print bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white shadow-md sticky top-0 z-30 border-b border-blue-900/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shrink-0 shadow-inner">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight leading-tight">
+            Generator Soal SMP <span class="text-emerald-400 font-semibold">— Kurikulum Merdeka</span>
+          </h1>
+          <p class="text-xs text-slate-300">Penyusun Naskah Soal, Kisi-Kisi, Kartu Soal, &amp; Rubrik Penilaian Otomatis</p>
+        </div>
+      </div>
+
+      <!-- Status Mesin Pembuat Soal -->
+      <div class="flex flex-wrap items-center gap-2 self-start sm:self-center">
+        <a href="https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P" target="_blank" rel="noopener noreferrer" title="Buka Tautan Referensi Gemini" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition">
+          <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"></path>
+          </svg>
+          <span>Tautan Gemini</span>
+        </a>
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="header-ai-status-text">Gemini AI • Generate Otomatis</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- KONTEN UTAMA -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- PANEL KIRI: FORM PARAMETER SOAL -->
+      <aside class="no-print lg:col-span-5 xl:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Parameter Naskah Soal</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Lengkapi identitas &amp; komposisi soal SMP</p>
+          </div>
+          <button type="button" id="btn-reset-form" title="Kosongkan formulir dan naskah untuk ganti soal baru" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-300 hover:border-rose-300 transition cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path>
+            </svg>
+            Reset Form
+          </button>
+        </div>
+
+        <form id="soal-form" class="p-5 space-y-4" novalidate="">
+          <!-- Kotak Validasi -->
+          <div id="validation-box" class="hidden rounded-xl bg-rose-50 border border-rose-200 p-3.5 text-xs text-rose-800 space-y-1">
+            <p class="font-bold text-rose-900">Mohon lengkapi parameter berikut:</p>
+            <ul id="validation-list" class="list-disc pl-4 space-y-0.5"></ul>
+          </div>
+
+          <!-- 1. Mata Pelajaran -->
+          <div>
+            <label for="mapel-select" class="block text-xs font-semibold text-slate-700 mb-1">1. Mata Pelajaran <span class="text-rose-500">*</span></label>
+            <select id="mapel-select" class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none transition">
+              <option value="">-- Pilih Mata Pelajaran --</option>
+              <option value="Ilmu Pengetahuan Alam (IPA)">Ilmu Pengetahuan Alam (IPA)</option>
+              <option value="Matematika">Matematika</option>
+              <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+              <option value="Bahasa Inggris">Bahasa Inggris</option>
+              <option value="Ilmu Pengetahuan Sosial (IPS)">Ilmu Pengetahuan Sosial (IPS)</option>
+              <option value="Pendidikan Pancasila">Pendidikan Pancasila</option>
+              <option value="Pendidikan Agama Islam dan Budi Pekerti">Pendidikan Agama Islam dan Budi Pekerti</option>
+              <option value="Informatika">Informatika</option>
+              <option value="Seni Budaya">Seni Budaya</option>
+              <option value="PJOK">PJOK</option>
+              <option value="Prakarya">Prakarya</option>
+              <option value="Bahasa Daerah / Madura">Bahasa Daerah / Madura</option>
+              <option value="__CUSTOM__">+ Mata Pelajaran Lainnya...</option>
+            </select>
+            <input type="text" id="mapel-custom" placeholder="Ketik nama mata pelajaran..." class="hidden mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-800 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none">
+          </div>
+
+          <!-- 2. Kelas -->
+          <div>
+            <label for="kelas-select" class="block text-xs font-semibold text-slate-700 mb-1">2. Kelas / Fase <span class="text-rose-500">*</span></label>
+            <select id="kelas-select" class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none transition">
+              <option value="">-- Pilih Kelas --</option>
+              <option value="7">Kelas 7 SMP (Fase D)</option>
+              <option value="8">Kelas 8 SMP (Fase D)</option>
+              <option value="9">Kelas 9 SMP (Fase D)</option>
+            </select>
+          </div>
+
+          <!-- 3. Materi Pokok -->
+          <div>
+            <label for="materi-input" class="block text-xs font-semibold text-slate-700 mb-1">3. Materi Pokok / Topik <span class="text-rose-500">*</span></label>
+            <input type="text" id="materi-input" placeholder="Contoh: Sistem Pernapasan Manusia / Teorema Pythagoras" class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none transition">
+          </div>
+
+          <!-- 4. Tingkat Kesulitan -->
+          <div>
+            <label for="kesulitan-select" class="block text-xs font-semibold text-slate-700 mb-1">4. Tingkat Kesulitan <span class="text-rose-500">*</span></label>
+            <select id="kesulitan-select" class="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none transition">
+              <option value="">-- Pilih Tingkat Kesulitan --</option>
+              <option value="Campuran Proporsional (30% Mudah L1, 40% Sedang L2, 30% HOTS L3)">Campuran Proporsional (L1, L2, &amp; HOTS L3)</option>
+              <option value="Mudah (Dominan L1 / C1-C2 Pemahaman Dasar)">Mudah (Dominan L1 / C1–C2)</option>
+              <option value="Sedang (Dominan L2 / C3 Aplikasi Konsep)">Sedang (Dominan L2 / C3)</option>
+              <option value="Sulit / HOTS (Dominan L3 / C4-C6 Penalaran &amp; Analisis)">Sulit / HOTS (Dominan L3 / C4–C6)</option>
+            </select>
+          </div>
+
+          <!-- 5. Rincian Jumlah Soal -->
+          <div class="pt-1">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-xs font-semibold text-slate-700">5. Rincian Jumlah Soal <span class="text-rose-500">*</span></label>
+              <span id="total-soal-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-950 text-emerald-300">12 Butir Soal</span>
+            </div>
+
+            <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+              <!-- A. PG Sederhana -->
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between gap-2">
+                  <div>
+                    <span class="block text-xs font-semibold text-slate-800">A. Pilihan Ganda Sederhana</span>
+                    <span class="block text-[11px] text-slate-500">4 opsi (A–D), 1 jawaban benar</span>
+                  </div>
+                  <input type="number" id="jml-pg-sederhana" min="0" max="40" value="5" class="w-16 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-semibold text-center text-slate-900 focus:border-blue-900 outline-none">
+                </div>
+                <div class="flex items-center justify-between gap-2 pl-3">
+                  <label for="gambar-pg-sederhana" class="text-[11px] text-slate-600">Sisipkan gambar pada PG Sederhana:</label>
+                  <select id="gambar-pg-sederhana" class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none">
+                    <option value="0" selected="">0 Gambar</option>
+                    <option value="1">1 Gambar</option>
+                    <option value="2">2 Gambar</option>
+                    <option value="3">3 Gambar</option>
+                    <option value="4">4 Gambar</option>
+                    <option value="5">5 Gambar</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- B. PG Kompleks -->
+              <div class="pt-2 border-t border-slate-200/70 space-y-1.5">
+                <div class="flex items-center justify-between gap-2">
+                  <div>
+                    <span class="block text-xs font-semibold text-slate-800">B. Pilihan Ganda Kompleks</span>
+                    <span class="block text-[11px] text-slate-500">&gt;1 jawaban benar (opsi abjad A–F)</span>
+                  </div>
+                  <input type="number" id="jml-pg-kompleks" min="0" max="20" value="2" class="w-16 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-semibold text-center text-slate-900 focus:border-blue-900 outline-none">
+                </div>
+                <div class="flex items-center justify-between gap-2 pl-3">
+                  <label for="pernyataan-pgk" class="text-[11px] text-slate-600">Jumlah opsi pernyataan / soal:</label>
+                  <select id="pernyataan-pgk" class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none">
+                    <option value="3">3 Pernyataan (A–C)</option>
+                    <option value="4" selected="">4 Pernyataan (A–D)</option>
+                    <option value="5">5 Pernyataan (A–E)</option>
+                    <option value="6">6 Pernyataan (A–F)</option>
+                  </select>
+                </div>
+                <div class="flex items-center justify-between gap-2 pl-3">
+                  <label for="gambar-pg-kompleks" class="text-[11px] text-slate-600">Sisipkan gambar pada PG Kompleks:</label>
+                  <select id="gambar-pg-kompleks" class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none">
+                    <option value="0" selected="">0 Gambar</option>
+                    <option value="1">1 Gambar</option>
+                    <option value="2">2 Gambar</option>
+                    <option value="3">3 Gambar</option>
+                    <option value="4">4 Gambar</option>
+                    <option value="5">5 Gambar</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- C. Benar / Salah -->
+              <div class="pt-2 border-t border-slate-200/70 space-y-1.5">
+                <div class="flex items-center justify-between gap-2">
+                  <div>
+                    <span class="block text-xs font-semibold text-slate-800">C. Benar / Salah (AKM)</span>
+                    <span class="block text-[11px] text-slate-500">Tabel pernyataan (Benar / Salah)</span>
+                  </div>
+                  <input type="number" id="jml-benar-salah" min="0" max="20" value="2" class="w-16 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-semibold text-center text-slate-900 focus:border-blue-900 outline-none">
+                </div>
+                <div class="flex items-center justify-between gap-2 pl-3">
+                  <label for="pernyataan-bs" class="text-[11px] text-slate-600">Jumlah baris pernyataan / soal:</label>
+                  <select id="pernyataan-bs" class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none">
+                    <option value="3">3 Pernyataan (A–C)</option>
+                    <option value="4" selected="">4 Pernyataan (A–D)</option>
+                    <option value="5">5 Pernyataan (A–E)</option>
+                  </select>
+                </div>
+                <div class="flex items-center justify-between gap-2 pl-3">
+                  <label for="gambar-benar-salah" class="text-[11px] text-slate-600">Sisipkan gambar pada Benar/Salah:</label>
+                  <select id="gambar-benar-salah" class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none">
+                    <option value="0" selected="">0 Gambar</option>
+                    <option value="1">1 Gambar</option>
+                    <option value="2">2 Gambar</option>
+                    <option value="3">3 Gambar</option>
+                    <option value="4">4 Gambar</option>
+                    <option value="5">5 Gambar</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- D. Menjodohkan -->
+              <div class="pt-2 border-t border-slate-200/70 space-y-1.5">
+                <div class="flex items-center justify-between gap-2">
+                  <div>
+                    <span class="block text-xs font-semibold text-slate-800">D. Menjodohkan (AKM)</span>
+                    <span class="block text-[11px] text-slate-500">Premis &amp; pilihan respon (+ pengecoh)</span>
+                  </div>
+                  <input type="number" id="jml-menjodohkan" min="0" max="20" value="1" class="w-16 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-semibold text-center text-slate-900 focus:border-blue-900 outline-none">
+                </div>
+                <div class="flex items-center justify-between gap-2 pl-3">
+                  <label for="premis-menjodohkan" class="text-[11px] text-slate-600">Jumlah premis / soal:</label>
+                  <select id="premis-menjodohkan" class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none">
+                    <option value="3" selected="">3 Premis (4 Respon)</option>
+                    <option value="4">4 Premis (5 Respon)</option>
+                    <option value="5">5 Premis (6 Respon)</option>
+                  </select>
+                </div>
+                <div class="flex items-center justify-between gap-2 pl-3">
+                  <label for="gambar-menjodohkan" class="text-[11px] text-slate-600">Sisipkan gambar pada Menjodohkan:</label>
+                  <select id="gambar-menjodohkan" class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none">
+                    <option value="0" selected="">0 Gambar</option>
+                    <option value="1">1 Gambar</option>
+                    <option value="2">2 Gambar</option>
+                    <option value="3">3 Gambar</option>
+                    <option value="4">4 Gambar</option>
+                    <option value="5">5 Gambar</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- E. Esai / Uraian -->
+              <div class="pt-2 border-t border-slate-200/70 space-y-1.5">
+                <div class="flex items-center justify-between gap-2">
+                  <div>
+                    <span class="block text-xs font-semibold text-slate-800">E. Esai / Uraian HOTS</span>
+                    <span class="block text-[11px] text-slate-500">Analitis + Rubrik skor</span>
+                  </div>
+                  <input type="number" id="jml-esai" min="0" max="15" value="2" class="w-16 rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-semibold text-center text-slate-900 focus:border-blue-900 outline-none">
+                </div>
+                <div class="flex items-center justify-between gap-2 pl-3">
+                  <label for="gambar-esai" class="text-[11px] text-slate-600">Sisipkan gambar pada Esai/Uraian:</label>
+                  <select id="gambar-esai" class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-800 outline-none">
+                    <option value="0" selected="">0 Gambar</option>
+                    <option value="1">1 Gambar</option>
+                    <option value="2">2 Gambar</option>
+                    <option value="3">3 Gambar</option>
+                    <option value="4">4 Gambar</option>
+                    <option value="5">5 Gambar</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. Logo Kop Surat (Opsional) -->
+          <details class="rounded-xl border border-slate-200 bg-slate-50/70 p-3 text-xs">
+            <summary class="font-semibold text-slate-700 cursor-pointer select-none">6. Logo Kop Surat Sekolah (Opsional)</summary>
+            <div class="mt-3 space-y-3">
+              <!-- Logo Pemkab (Kiri) -->
+              <div class="space-y-1.5">
+                <span class="font-semibold text-slate-700 block">Logo Pemkab (Kiri):</span>
+                <div class="flex items-center gap-2">
+                  <div id="thumb-logo-pemkab" class="w-10 h-10 rounded-lg border border-slate-300 bg-white flex items-center justify-center text-[10px] text-slate-400 overflow-hidden shrink-0">Kiri</div>
+                  <div class="flex-1 space-y-1">
+                    <div class="flex gap-1.5">
+                      <label class="px-2.5 py-1 rounded-lg bg-blue-950 text-white font-medium cursor-pointer hover:bg-blue-900 transition">
+                        Pilih Gambar
+                        <input type="file" id="input-logo-pemkab" accept="image/*" class="hidden">
+                      </label>
+                      <button type="button" id="btn-clear-logo-pemkab" class="hidden px-2 py-1 rounded-lg bg-rose-100 text-rose-700 font-medium hover:bg-rose-200">Hapus</button>
+                    </div>
+                    <input type="url" id="url-logo-pemkab" placeholder="Atau tempel URL logo Pemkab..." class="w-full rounded-lg border border-slate-300 bg-white px-2 py-1 text-[11px] outline-none">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Logo Sekolah (Kanan) -->
+              <div class="space-y-1.5 pt-2 border-t border-slate-200/70">
+                <span class="font-semibold text-slate-700 block">Logo Sekolah (Kanan):</span>
+                <div class="flex items-center gap-2">
+                  <div id="thumb-logo-sekolah" class="w-10 h-10 rounded-lg border border-slate-300 bg-white flex items-center justify-center text-[10px] text-slate-400 overflow-hidden shrink-0">Kanan</div>
+                  <div class="flex-1 space-y-1">
+                    <div class="flex gap-1.5">
+                      <label class="px-2.5 py-1 rounded-lg bg-blue-950 text-white font-medium cursor-pointer hover:bg-blue-900 transition">
+                        Pilih Gambar
+                        <input type="file" id="input-logo-sekolah" accept="image/*" class="hidden">
+                      </label>
+                      <button type="button" id="btn-clear-logo-sekolah" class="hidden px-2 py-1 rounded-lg bg-rose-100 text-rose-700 font-medium hover:bg-rose-200">Hapus</button>
+                    </div>
+                    <input type="url" id="url-logo-sekolah" placeholder="Atau tempel URL logo Sekolah..." class="w-full rounded-lg border border-slate-300 bg-white px-2 py-1 text-[11px] outline-none">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <!-- 7. Pembuat Soal Otomatis via Gemini AI -->
+          <div class="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <span class="block text-xs font-bold text-blue-950">7. Penyusun Soal Otomatis (Gemini AI)</span>
+              <span id="gemini-sync-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900">Siap Menyusun</span>
+            </div>
+
+            <p class="text-[11px] text-slate-600 leading-relaxed">
+              Isi parameter di atas (dan tambahkan fokus/catatan khusus di bawah bila perlu). <strong>Gemini AI</strong> akan memproses instruksi tersebut menjadi naskah soal yang akurat sesuai mata pelajaran, stimulus kontekstual, kunci jawaban, pembahasan, kisi-kisi, dan kartu soal.
+            </p>
+
+            <div class="flex items-center justify-between gap-2 px-2.5 py-2 rounded-lg bg-white border border-blue-200/80 text-[11px]">
+              <a href="https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-900 hover:underline truncate flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"></path>
+                </svg>
+                <span>Buka Referensi Gemini Share</span>
+              </a>
+              <button type="button" onclick="copyGeminiReferenceLink()" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold shrink-0 cursor-pointer">
+                Salin Link
+              </button>
+            </div>
+
+            <div>
+              <label for="custom-prompt-instruction" class="block text-[11px] font-semibold text-slate-700 mb-1">Instruksi Tambahan / Fokus Materi (Opsional):</label>
+              <textarea id="custom-prompt-instruction" rows="2" placeholder="Contoh: Fokuskan pada perhitungan debit dan tekanan hidrostatis dalam kehidupan sehari-hari, gunakan bahasa yang mudah dipahami siswa kelas 8..." class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-800 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none transition"></textarea>
+            </div>
+
+            <!-- TOMBOL UTAMA GENERATE SOAL -->
+            <button type="submit" id="btn-generate" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-700 to-blue-950 hover:from-emerald-600 hover:to-blue-900 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60">
+              <svg id="btn-generate-icon" class="w-5 h-5 text-emerald-300 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v3m0 12v3m9-9h-3M6 12H3m15.364-6.364-2.121 2.121M7.757 16.243l-2.121 2.121m12.728 0-2.121-2.121M7.757 7.757 5.636 5.636"></path></svg>
+              <span id="btn-generate-label">Buat Paket Soal Sekarang</span>
+            </button>
+          </div>
+        </form>
+      </aside>
+
+      <!-- PANEL KANAN: HASIL NASKAH SOAL, KISI-KISI & ANALISIS -->
+      <section class="lg:col-span-7 xl:col-span-8 print-full-width space-y-4">
+
+        <!-- TOOLBAR NAVIGASI TAB & TOMBOL EKSPOR -->
+        <div id="result-toolbar" class="no-print hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-3 space-y-2.5">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button type="button" id="tab-semua" onclick="switchTab('semua')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-950 text-white transition cursor-pointer">Semua</button>
+            <button type="button" id="tab-naskah" onclick="switchTab('naskah')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">Naskah Soal</button>
+            <button type="button" id="tab-kunci" onclick="switchTab('kunci')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">Kunci &amp; Pembahasan</button>
+            <button type="button" id="tab-kisikisi" onclick="switchTab('kisikisi')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">Kisi-Kisi &amp; Kartu Soal</button>
+            <button type="button" id="tab-analisis" onclick="switchTab('analisis')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">Analisis Kognitif</button>
+            <button type="button" id="tab-kuis" onclick="switchTab('kuis')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer">Mode Kuis</button>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button type="button" onclick="printExam()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-900 text-white transition cursor-pointer">
+                Cetak / PDF
+              </button>
+              <button type="button" onclick="downloadWordPart('soal')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-700 hover:bg-blue-800 text-white transition cursor-pointer">
+                Soal (.doc)
+              </button>
+              <button type="button" onclick="downloadWordPart('kunci')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-700 hover:bg-emerald-800 text-white transition cursor-pointer">
+                Kunci (.doc)
+              </button>
+              <button type="button" onclick="downloadWordPart('kisikisi')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-700 hover:bg-indigo-800 text-white transition cursor-pointer">
+                Kisi-Kisi &amp; Kartu (.doc)
+              </button>
+              <button type="button" onclick="copyPlainText()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer">
+                Salin Teks
+              </button>
+            </div>
+            <button type="button" onclick="resetAllWorkspace()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition cursor-pointer">
+              Reset / Soal Baru
+            </button>
+          </div>
+        </div>
+
+        <!-- STATE 1: PRATINJAU KOP SURAT -->
+        <div id="empty-state" class="no-print bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-4">
+          <div class="exam-paper border border-slate-200 rounded-xl p-5 bg-white shadow-inner">
+            <table class="kop-header-table">
+              <colgroup>
+                <col style="width: 15%;">
+                <col style="width: 70%;">
+                <col style="width: 15%;">
+              </colgroup>
+              <tbody><tr>
+                <td id="kop-logo-pemkab-slot" style="text-align: center;"><button type="button" onclick="document.getElementById('input-logo-pemkab').click()" class="no-print text-[10px] text-slate-400 hover:text-blue-900 border border-dashed border-slate-300 rounded-lg px-2 py-3 cursor-pointer">+ Logo Pemkab</button></td>
+                <td style="text-align: center; line-height: 1.3;">
+                  <div style="font-size: 12pt; font-weight: bold; letter-spacing: 0.4px;">PEMERINTAH KABUPATEN SITUBONDO</div>
+                  <div style="font-size: 15pt; font-weight: bold; letter-spacing: 0.6px;">SMP NEGERI 3 BESUKI</div>
+                  <div style="font-size: 9.5pt;">Jalan Gunung Ringgit Besuki, Situbondo, Jawa Timur 68356</div>
+                  <div style="font-size: 9pt; font-style: italic;">Laman www.smpn3besuki.sch.id E-Mail : admin@smpn3besuki.sch.id</div>
+                </td>
+                <td id="kop-logo-sekolah-slot" style="text-align: center;"><button type="button" onclick="document.getElementById('input-logo-sekolah').click()" class="no-print text-[10px] text-slate-400 hover:text-blue-900 border border-dashed border-slate-300 rounded-lg px-2 py-3 cursor-pointer">+ Logo Sekolah</button></td>
+              </tr>
+            </tbody></table>
+            <div style="text-align: center; font-size: 10pt; color: #475569; padding-top: 4px;">
+              Lengkapi parameter di panel kiri lalu klik <strong>Buat Paket Soal Sekarang</strong> untuk menyusun naskah ujian lengkap di bawah kop surat ini, atau buka referensi langsung di <a href="https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; font-weight: 600; text-decoration: underline;">Gemini Share</a>.
+            </div>
+          </div>
+        </div>
+
+        <!-- STATE 2: LOADING OTOMATIS -->
+        <div id="loading-state" class="no-print hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-10 sm:p-14 text-center space-y-4">
+          <div class="w-12 h-12 rounded-full border-4 border-slate-200 border-t-blue-950 animate-spin mx-auto"></div>
+          <div class="space-y-1.5">
+            <h3 class="text-base font-bold text-slate-900">Menyusun Naskah Soal Standar Kurikulum Merdeka (Gemini AI)...</h3>
+            <p id="loading-step-text" class="text-xs text-slate-600">Menyusun stimulus kontekstual, butir soal, kunci jawaban, dan kisi-kisi langsung ke panel sebelah kanan...</p>
+            <div class="pt-1">
+              <span id="loading-timer-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-900 border border-blue-200">Waktu proses: 0 detik</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATE 3: DOKUMEN NASKAH SOAL, KUNCI, KISI-KISI & ANALISIS -->
+        <div id="document-container" class="exam-paper hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-10 print-full-width"></div>
+
+        <!-- STATE 3: MODE KUIS INTERAKTIF -->
+        <div id="quiz-container" class="no-print hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6"></div>
+
+      </section>
+    </div>
+  </main>
+
+  <footer class="no-print border-t border-slate-200 bg-white py-3.5 px-6 text-center text-xs text-slate-500">
+    Generator Soal SMP — Standar Kurikulum Merdeka (Fase D) • SMP Negeri 3 Besuki •
+    <a href="https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P" target="_blank" rel="noopener noreferrer" class="text-blue-900 font-semibold hover:underline">Referensi Gemini</a>
+  </footer>
+
+  <!-- SCRIPT UTAMA APLIKASI -->
+  <script>
+    const STORAGE_LOGO_PEMKAB = 'smp_soal_logo_pemkab_v1';
+    const STORAGE_LOGO_SEKOLAH = 'smp_soal_logo_sekolah_v1';
+    const GEMINI_MODEL = 'gemini-3-flash-preview';
+    const GEMINI_SHARE_REFERENCE_URL = 'https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P';
+    const DEFAULT_GEMINI_API_KEY = 'AQ.Ab8RN6JzsB9YBfmpflCQDhXATRYRKYLHN-5kP6Eseo8LCgl6Jg';
+
+    let currentGeneratedData = null;
+    let currentMeta = null;
+    let currentTab = 'semua';
+    let logoPemkabData = '';
+    let logoSekolahData = '';
+    let editableJudulAsesmen = 'ASESMEN SUMATIF LINGKUP MATERI';
+    let editableAlokasiWaktu = '90 Menit';
+    let loadingTimerInterval = null;
+
+    /* ==========================================================================
+       1. UTILITAS UMUM & NOTIFIKASI
+       ========================================================================== */
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatRichText(text) {
+      if (text === null || text === undefined) return '';
+      let s = String(text);
+      const safeTags = [];
+      s = s.replace(/<\/?(sup|sub|b|strong|i|em|u|br)\b[^>]*>/gi, (match) => {
+        const token = `___SAFE_TAG_${safeTags.length}___`;
+        safeTags.push(match);
+        return token;
+      });
+      s = escapeHtml(s);
+      s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      s = s.replace(/\n/g, '<br />');
+      safeTags.forEach((tag, idx) => {
+        s = s.replace(`___SAFE_TAG_${idx}___`, tag);
+      });
+      return s;
+    }
+
+    function showToast(message, type = 'info') {
+      const existing = document.getElementById('app-toast');
+      if (existing) existing.remove();
+
+      const colors = {
+        success: 'bg-emerald-900 text-white border-emerald-700',
+        error: 'bg-rose-900 text-white border-rose-700',
+        info: 'bg-slate-900 text-white border-slate-700'
+      };
+      const toast = document.createElement('div');
+      toast.id = 'app-toast';
+      toast.className = `no-print fixed bottom-5 right-5 z-50 max-w-sm px-4 py-3 rounded-xl shadow-xl border text-xs font-medium leading-relaxed transition-all ${colors[type] || colors.info}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        if (toast.parentNode) toast.remove();
+      }, 4500);
+    }
+
+    function copyGeminiReferenceLink() {
+      if (copyTextToClipboard(GEMINI_SHARE_REFERENCE_URL)) {
+        showToast('Tautan Gemini berhasil disalin ke clipboard.', 'success');
+      } else {
+        showToast('Gagal menyalin tautan Gemini.', 'error');
+      }
+    }
+
+    function getAlphabetLabel(index) {
+      return String.fromCharCode(65 + index);
+    }
+
+    function normalizePgkOptions(opsiList) {
+      if (!Array.isArray(opsiList)) return [];
+      return opsiList.map((item, idx) => {
+        const huruf = getAlphabetLabel(idx);
+        if (typeof item === 'string') {
+          const cleanTeks = item.replace(/^[A-Za-z0-9]+[\.\)]\s*/, '');
+          return { huruf, teks: cleanTeks };
+        }
+        const rawTeks = item?.teks || item?.pernyataan || item?.text || '';
+        const cleanTeks = String(rawTeks).replace(/^[A-Za-z0-9]+[\.\)]\s*/, '');
+        return { huruf, teks: cleanTeks };
+      });
+    }
+
+    function normalizeBsStatements(pernyataanList) {
+      if (!Array.isArray(pernyataanList)) return [];
+      return pernyataanList.map((item, idx) => {
+        const huruf = getAlphabetLabel(idx);
+        const rawTeks = typeof item === 'string' ? item : (item?.teks || item?.pernyataan || '');
+        const cleanTeks = String(rawTeks).replace(/^[A-Za-z0-9]+[\.\)]\s*/, '');
+        const jawaban = typeof item === 'object' && item?.jawaban
+          ? (/benar/i.test(String(item.jawaban)) ? 'Benar' : 'Salah')
+          : 'Benar';
+        return { huruf, teks: cleanTeks, jawaban };
+      });
+    }
+
+    /* ==========================================================================
+       2. UTILITAS TIMER, WIKIPEDIA & GAMBAR RIIL
+       ========================================================================== */
+    function startLoadingTimer() {
+      stopLoadingTimer();
+      const startTime = Date.now();
+      const badge = document.getElementById('loading-timer-badge');
+      if (badge) badge.textContent = 'Waktu proses: 0 detik';
+      loadingTimerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        if (badge) badge.textContent = `Waktu proses: ${elapsed} detik`;
+      }, 1000);
+    }
+
+    function stopLoadingTimer() {
+      if (loadingTimerInterval) {
+        clearInterval(loadingTimerInterval);
+        loadingTimerInterval = null;
+      }
+    }
+
+    function updateGeminiSyncBadge(label, tone = 'emerald') {
+      const badge = document.getElementById('gemini-sync-badge');
+      if (!badge) return;
+      badge.textContent = label;
+      if (tone === 'amber') {
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900';
+      } else if (tone === 'rose') {
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-900';
+      } else {
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900';
+      }
+    }
+
+    async function fetchWikipediaSummaryContext(topic, mapel) {
+      const queries = [topic, `${topic} ${mapel}`];
+      const facts = [];
+      for (const q of queries) {
+        try {
+          const searchUrl = `https://id.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(q)}&utf8=&format=json&origin=*&srlimit=2`;
+          const resp = await fetch(searchUrl);
+          if (!resp.ok) continue;
+          const json = await resp.json();
+          const hits = json?.query?.search || [];
+          for (const h of hits) {
+            const snippet = String(h.snippet || '').replace(/<[^>]*>/g, '').trim();
+            if (snippet && snippet.length > 35) {
+              facts.push({ title: h.title || topic, text: snippet });
+            }
+          }
+          if (facts.length >= 2) break;
+        } catch (e) {}
+      }
+      return facts;
+    }
+
+    async function fetchRealTopicImages(topic, mapel, neededCount) {
+      if (!neededCount || neededCount <= 0) return [];
+      const foundImages = [];
+      const seenUrls = new Set();
+
+      const addUniqueImage = (url, caption) => {
+        if (!url || seenUrls.has(url)) return;
+        const cleanUrl = String(url).trim();
+        if (!/^https?:\/\//i.test(cleanUrl)) return;
+        if (/\.(ogg|ogv|webm|pdf|djvu|tif|tiff)(\?|$)/i.test(cleanUrl)) return;
+        if (/icon|logo|flag|stub|ambox|symbol|commons-logo|wiki-letter|disambig|map_of|locator|blank/i.test(cleanUrl)) return;
+        seenUrls.add(cleanUrl);
+        foundImages.push({ url: cleanUrl, caption: caption || topic });
+      };
+
+      const idToEnGlossary = [
+        [/subak|pembagian\s+air\s+di\s+bali|sawah\s+bertingkat|terasering/i, 'Subak (irrigation) Bali rice terraces'],
+        [/sasi\s+(?:laut|lompa|maluku)|kearifan\s+lokal\s+maluku/i, 'Sasi Maluku conservation'],
+        [/hutan\s+larangan|baduy|kanekes/i, 'Baduy people Banten Indonesia'],
+        [/rumah\s+gadang|minangkabau/i, 'Rumah Gadang Minangkabau'],
+        [/tongkonan|toraja/i, 'Tongkonan Tana Toraja'],
+        [/pura/i, 'Balinese temple Pura'],
+        [/paru[\s-]?paru|pernapasan|alveolus|bronkus/i, 'human lungs respiratory system diagram'],
+        [/jantung|peredaran\s+darah|pembuluh/i, 'human heart circulatory system diagram'],
+        [/pencernaan|lambung|usus/i, 'human digestive system diagram'],
+        [/segitiga\s+siku|pythagoras|hipotenusa/i, 'right triangle geometry diagram'],
+        [/prisma|tabung|kerucut|kubus|balok|bangun\s+ruang/i, 'geometric prism cylinder volume diagram'],
+        [/lingkaran|jari[\s-]?jari|diameter/i, 'circle radius diameter geometry'],
+        [/fotosintesis|klorofil|daun/i, 'photosynthesis leaf diagram'],
+        [/sel\s+hewan|sel\s+tumbuhan|mitokondria/i, 'plant animal cell structure diagram'],
+        [/gunung\s+berapi|vulkanik|tektonik|gempa/i, 'volcano tectonic plates diagram'],
+        [/tata\s+surya|planet|gerhana/i, 'solar system planets diagram'],
+        [/listrik|rangkaian|arus|tegangan/i, 'electric circuit diagram'],
+        [/cahaya|cermin|lensa|pembiasan/i, 'optics light refraction lens diagram'],
+        [/candi|borobudur|prambanan|sejarah/i, 'Borobudur temple Indonesia heritage'],
+        [/batik|tenun|wayang|kerajinan|kearifan\s+lokal/i, 'Indonesian traditional batik culture'],
+        [/gotong\s+royong|musyawarah|pancasila/i, 'Indonesian community cooperation'],
+        [/peta|indonesia|nusantara|geografi/i, 'Indonesia archipelago geography'],
+        [/ekosistem|rantai\s+makanan|hutan/i, 'forest ecosystem food chain'],
+        [/masjid|al[\s-]?qur'?an|salat|ibadah/i, 'mosque Quran Islamic architecture'],
+        [/komputer|jaringan|algoritma|perangkat/i, 'computer hardware network diagram']
+      ];
+
+      const exactWikiArticles = [
+        [/subak|pembagian\s+air\s+di\s+bali|sawah\s+bertingkat.*bali/i, { id: 'Subak', en: 'Subak (irrigation)' }],
+        [/borobudur/i, { id: 'Candi Borobudur', en: 'Borobudur' }],
+        [/prambanan/i, { id: 'Candi Prambanan', en: 'Prambanan' }],
+        [/rumah\s+gadang/i, { id: 'Rumah Gadang', en: 'Rumah Gadang' }],
+        [/tongkonan/i, { id: 'Tongkonan', en: 'Tongkonan' }],
+        [/batik/i, { id: 'Batik', en: 'Batik' }],
+        [/wayang/i, { id: 'Wayang', en: 'Wayang' }],
+        [/fotosintesis/i, { id: 'Fotosintesis', en: 'Photosynthesis' }],
+        [/teorema\s+pythagoras|pythagoras/i, { id: 'Teorema Pythagoras', en: 'Pythagorean theorem' }],
+        [/sistem\s+pernapasan|paru[\s-]?paru/i, { id: 'Sistem pernapasan', en: 'Respiratory system' }],
+        [/sistem\s+pencernaan/i, { id: 'Sistem pencernaan', en: 'Human digestive system' }],
+        [/tata\s+surya/i, { id: 'Tata Surya', en: 'Solar System' }]
+      ];
+
+      const rawText = String(topic || '').trim();
+      const matchedEnglishTerms = [];
+      for (const [regex, enQuery] of idToEnGlossary) {
+        if (regex.test(rawText)) {
+          matchedEnglishTerms.push(enQuery);
+        }
+      }
+
+      for (const [regex, titles] of exactWikiArticles) {
+        if (regex.test(rawText)) {
+          for (const [lang, title] of [['id', titles.id], ['en', titles.en]]) {
+            if (!title || foundImages.length >= neededCount) continue;
+            try {
+              const exactUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages|images&piprop=thumbnail|original&pithumbsize=720&imlimit=6&format=json&origin=*`;
+              const resp = await fetch(exactUrl);
+              if (resp.ok) {
+                const data = await resp.json();
+                const pages = Object.values(data?.query?.pages || {});
+                for (const p of pages) {
+                  const mainImg = p?.thumbnail?.source || p?.original?.source;
+                  if (mainImg) {
+                    addUniqueImage(mainImg, p.title || title);
+                  }
+                }
+              }
+            } catch (e) {}
+          }
+        }
+      }
+
+      const stopWords = new Set([
+        'yang', 'dan', 'atau', 'dengan', 'pada', 'dalam', 'untuk', 'dari', 'ke', 'di', 'sebuah',
+        'tersebut', 'berikut', 'adalah', 'perhatikan', 'gambar', 'ilustrasi', 'soal', 'pertanyaan',
+        'tentang', 'mengenai', 'berdasarkan', 'proses', 'sistem', 'secara', 'dapat', 'akan', 'ini', 'itu'
+      ]);
+      const topicWords = rawText
+        .replace(/[^\w\s\u00C0-\u024F-]/g, ' ')
+        .split(/\s+/)
+        .filter((w) => w.length > 2 && !stopWords.has(w.toLowerCase()));
+      const focusedIdQuery = topicWords.slice(0, 5).join(' ') || rawText;
+      const shortIdQuery = topicWords.slice(0, 3).join(' ') || rawText;
+      const mapelClean = String(mapel || '').replace(/\([^)]*\)/g, '').trim();
+
+      const queries = Array.from(new Set([
+        ...matchedEnglishTerms,
+        focusedIdQuery,
+        shortIdQuery,
+        `${shortIdQuery} ${mapelClean}`,
+        mapelClean
+      ].filter(Boolean)));
+
+      for (const lang of ['id', 'en']) {
+        if (foundImages.length >= neededCount) break;
+        const langQueries = lang === 'en' && matchedEnglishTerms.length > 0
+          ? [...matchedEnglishTerms, ...queries]
+          : queries;
+        for (const q of langQueries) {
+          if (foundImages.length >= neededCount) break;
+          try {
+            const apiUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(q)}&gsrlimit=8&prop=pageimages&piprop=thumbnail|original&pithumbsize=640&format=json&origin=*`;
+            const resp = await fetch(apiUrl);
+            if (!resp.ok) continue;
+            const data = await resp.json();
+            const pages = Object.values(data?.query?.pages || {});
+            for (const p of pages) {
+              const chosenUrl = p?.thumbnail?.source || p?.original?.source;
+              if (chosenUrl) {
+                addUniqueImage(chosenUrl, p.title || focusedIdQuery);
+                if (foundImages.length >= neededCount) break;
+              }
+            }
+          } catch (e) {}
+        }
+      }
+
+      const commonsQueries = Array.from(new Set([...matchedEnglishTerms, focusedIdQuery, shortIdQuery].filter(Boolean)));
+      for (const q of commonsQueries) {
+        if (foundImages.length >= neededCount) break;
+        try {
+          const commonsUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(q)}&gsrnamespace=6&gsrlimit=10&prop=imageinfo&iiprop=url|mime&iiurlwidth=640&format=json&origin=*`;
+          const resp = await fetch(commonsUrl);
+          if (!resp.ok) continue;
+          const data = await resp.json();
+          const pages = Object.values(data?.query?.pages || {});
+          for (const p of pages) {
+            const info = p?.imageinfo?.[0];
+            const mime = info?.mime || '';
+            if (mime && !/^image\/(jpeg|png|webp|gif)$/i.test(mime)) continue;
+            const imgUrl = info?.thumburl || info?.url;
+            if (imgUrl) {
+              const cleanTitle = String(p.title || focusedIdQuery)
+                .replace(/^File:/i, '')
+                .replace(/\.[^.]+$/, '')
+                .replace(/[_-]+/g, ' ')
+                .trim();
+              addUniqueImage(imgUrl, cleanTitle);
+              if (foundImages.length >= neededCount) break;
+            }
+          }
+        } catch (e) {}
+      }
+
+      const enKeywordTag = matchedEnglishTerms.length > 0
+        ? encodeURIComponent(matchedEnglishTerms[0].split(/\s+/).slice(0, 2).join(',').toLowerCase())
+        : encodeURIComponent((topicWords.slice(0, 2).join(',') || 'education').toLowerCase());
+      let fallbackIdx = 1;
+      while (foundImages.length < neededCount) {
+        const hashSeed = Array.from(rawText).reduce((acc, ch) => acc + ch.charCodeAt(0), 0) + fallbackIdx * 31;
+        addUniqueImage(
+          `https://loremflickr.com/560/320/${enKeywordTag}/all?lock=${hashSeed % 9999}`,
+          `Ilustrasi ${focusedIdQuery}`
+        );
+        fallbackIdx++;
+      }
+
+      return foundImages;
+    }
+
+    function getLevelLabelByIndex(index, kesulitan) {
+      if (/Mudah/i.test(kesulitan)) return index % 3 === 0 ? 'L2 (C3)' : 'L1 (C2)';
+      if (/Sedang/i.test(kesulitan)) return index % 4 === 0 ? 'L3 (C4)' : 'L2 (C3)';
+      if (/Sulit|HOTS/i.test(kesulitan)) return index % 4 === 0 ? 'L2 (C3)' : 'L3 (C4)';
+      const cycle = ['L1 (C2)', 'L2 (C3)', 'L3 (C4)'];
+      return cycle[index % cycle.length];
+    }
+
+    function buildSubjectQuestionBank(meta, wikiFacts = []) {
+      const m = meta.mapel;
+      const t = meta.materi;
+      const k = meta.kelas;
+      const fact0 = wikiFacts[0]?.text || '';
+      const fact1 = wikiFacts[1]?.text || '';
+
+      if (/matematika/i.test(m)) {
+        return {
+          mcqs: [
+            {
+              stimulus: `Dalam pembelajaran ${t} di kelas ${k}, diketahui sebuah pola bilangan dan hubungan variabel dengan nilai awal a = 12 dan selisih tetap b = 5.`,
+              pertanyaan: `Berdasarkan konsep ${t}, nilai suku ke-8 dari barisan tersebut adalah ....`,
+              opsi: { A: '42', B: '47', C: '52', D: '57' },
+              kunci: 'B',
+              pembahasan: `U<sub>8</sub> = a + (8 − 1)b = 12 + 7(5) = 12 + 35 = 47.`
+            },
+            {
+              stimulus: `Sebuah taman sekolah berbentuk persegi panjang memiliki ukuran panjang (2x + 4) meter dan lebar (x + 2) meter yang dikaji dalam materi ${t}.`,
+              pertanyaan: `Jika keliling taman tersebut adalah 60 meter, maka nilai x yang memenuhi persamaan adalah ....`,
+              opsi: { A: '6', B: '8', C: '10', D: '12' },
+              kunci: 'B',
+              pembahasan: `Keliling = 2(p + l) → 60 = 2(3x + 6) → 30 = 3x + 6 → 3x = 24 → x = 8.`
+            },
+            {
+              stimulus: `Data hasil ulangan harian materi ${t} dari 5 siswa kelas ${k} tercatat sebagai berikut: 75, 80, 85, 90, dan 95.`,
+              pertanyaan: `Nilai rata-rata (mean) dan median dari kumpulan data nilai tersebut secara berturut-turut adalah ....`,
+              opsi: { A: '80 dan 85', B: '85 dan 80', C: '85 dan 85', D: '90 dan 85' },
+              kunci: 'C',
+              pembahasan: `Jumlah nilai = 425; rata-rata = 425 ÷ 5 = 85. Nilai tengah (median) data terurut ke-3 adalah 85.`
+            },
+            {
+              stimulus: `Sebuah bangun ruang sisi datar memiliki luas alas 48 cm<sup>2</sup> dan tinggi 15 cm sebagai model penerapan ${t}.`,
+              pertanyaan: `Volume prisma tegak yang terbentuk dari ukuran tersebut adalah ....`,
+              opsi: { A: '240 cm<sup>3</sup>', B: '360 cm<sup>3</sup>', C: '620 cm<sup>3</sup>', D: '720 cm<sup>3</sup>' },
+              kunci: 'D',
+              pembahasan: `Volume prisma = Luas alas × tinggi = 48 cm<sup>2</sup> × 15 cm = 720 cm<sup>3</sup>.`
+            },
+            {
+              stimulus: `Dalam kegiatan koperasi sekolah, harga sebuah paket alat tulis Rp40.000,00 mendapat diskon 15% saat pekan literasi ${t}.`,
+              pertanyaan: `Besar uang yang harus dibayarkan siswa setelah memperoleh potongan harga adalah ....`,
+              opsi: { A: 'Rp32.000,00', B: 'Rp34.000,00', C: 'Rp35.000,00', D: 'Rp36.000,00' },
+              kunci: 'B',
+              pembahasan: `Diskon = 15% × Rp40.000 = Rp6.000. Harga bayar = Rp40.000 − Rp6.000 = Rp34.000,00.`
+            }
+          ],
+          pgk: [
+            {
+              stimulus: `Perhatikan bentuk aljabar dan persamaan linear berikut dalam kajian ${t}: (1) 3x + 6 = 21; (2) 2y − 4 = 10.`,
+              pertanyaan: `Pernyataan matematis yang bernilai benar berdasarkan persamaan di atas adalah ....`,
+              opsi: [
+                'Nilai x yang memenuhi persamaan pertama adalah 5',
+                'Nilai y yang memenuhi persamaan kedua adalah 7',
+                'Hasil penjumlahan x + y sama dengan 15',
+                'Selisih nilai y − x sama dengan 2',
+                'Nilai 2x + y sama dengan 20',
+                'Persamaan pertama memiliki konstanta 21'
+              ],
+              kunci: ['A', 'B', 'D'],
+              pembahasan: `Dari 3x + 6 = 21 diperoleh x = 5, dan dari 2y − 4 = 10 diperoleh y = 7, sehingga y − x = 2.`
+            }
+          ],
+          bs: [
+            {
+              stimulus: `Diketahui sebuah segitiga siku-siku ABC memiliki panjang sisi siku-siku AB = 6 cm dan BC = 8 cm pada penerapan ${t}.`,
+              pertanyaan: `Tentukan kebenaran setiap pernyataan matematis berikut berdasarkan ukuran segitiga tersebut!`,
+              pernyataan: [
+                { teks: 'Panjang sisi miring (hipotenusa) AC adalah 10 cm.', jawaban: 'Benar' },
+                { teks: 'Keliling segitiga ABC seluruhnya adalah 24 cm.', jawaban: 'Benar' },
+                { teks: 'Luas daerah segitiga ABC adalah 48 cm<sup>2</sup>.', jawaban: 'Salah' },
+                { teks: 'Kuadrat sisi miring sama dengan jumlah kuadrat kedua sisi siku-sikunya.', jawaban: 'Benar' },
+                { teks: 'Segitiga tersebut termasuk segitiga tumpul.', jawaban: 'Salah' }
+              ],
+              pembahasan: `AC = √(6<sup>2</sup> + 8<sup>2</sup>) = 10 cm; Keliling = 6 + 8 + 10 = 24 cm; Luas = ½ × 6 × 8 = 24 cm<sup>2</sup>.`
+            }
+          ],
+          mj: [
+            {
+              stimulus: `Pasangkan bentuk operasi hitung dan rumus pada materi ${t} berikut dengan hasil yang tepat!`,
+              pertanyaan: `Jodohkan pernyataan di kolom kiri dengan nilai yang sesuai di kolom kanan!`,
+              premis: [
+                { id: '1', teks: 'Hasil dari 3<sup>2</sup> + 4<sup>2</sup>' },
+                { id: '2', teks: 'Nilai x pada persamaan 4x − 3 = 17' },
+                { id: '3', teks: 'Keliling persegi dengan panjang sisi 9 cm' },
+                { id: '4', teks: 'Hasil dari √144 + √25' },
+                { id: '5', teks: 'Besar sudut berpelurus dari 115°' }
+              ],
+              respon: [
+                { id: 'A', teks: '36 cm' },
+                { id: 'B', teks: '25' },
+                { id: 'C', teks: '5' },
+                { id: 'D', teks: '17' },
+                { id: 'E', teks: '65°' },
+                { id: 'F', teks: '49' }
+              ],
+              kunci_pasangan: { '1': 'B', '2': 'C', '3': 'A', '4': 'D', '5': 'E' },
+              pembahasan: `3<sup>2</sup>+4<sup>2</sup>=25; 4x=20→x=5; Keliling=4×9=36 cm; 12+5=17; 180°−115°=65°.`
+            }
+          ],
+          esai: [
+            {
+              stimulus: `Sebuah aula sekolah berukuran panjang 12 m dan lebar 9 m akan dipasangi ubin keramik berukuran 30 cm × 30 cm sebagai studi kasus ${t}.`,
+              pertanyaan: `Hitunglah luas lantai aula dalam satuan cm<sup>2</sup> dan tentukan banyak minimal ubin keramik yang dibutuhkan untuk menutup seluruh lantai!`,
+              kunci_jawaban: `Luas aula = 12 m × 9 m = 108 m<sup>2</sup> = 1.080.000 cm<sup>2</sup>. Luas 1 ubin = 30 cm × 30 cm = 900 cm<sup>2</sup>. Banyak ubin = 1.080.000 ÷ 900 = 1.200 buah ubin.`,
+              rubrik_skor: [
+                { kriteria: 'Menuliskan langkah konversi satuan, luas lantai, luas ubin, dan hasil akhir 1.200 ubin dengan tepat.', skor: 4 },
+                { kriteria: 'Langkah perhitungan benar namun terdapat sedikit kekeliruan penulisan satuan.', skor: 3 },
+                { kriteria: 'Hanya menghitung luas lantai atau luas ubin secara terpisah tanpa pembagian akhir.', skor: 2 },
+                { kriteria: 'Menuliskan rumus dasar namun hasil belum tepat.', skor: 1 }
+              ],
+              skor_maksimal: 4
+            }
+          ]
+        };
+      }
+
+      if (/agama islam|pai/i.test(m)) {
+        return {
+          mcqs: [
+            {
+              stimulus: `Dalam kajian ${t} pada mata pelajaran Pendidikan Agama Islam kelas ${k}, setiap muslim diperintahkan untuk senantiasa menuntut ilmu, beriman, dan beramal saleh dalam kehidupan sehari-hari.`,
+              teks_arab: 'يَرْفَعِ اللّٰهُ الَّذِيْنَ اٰمَنُوْا مِنْكُمْۙ وَالَّذِيْنَ اُوْتُوا الْعِلْمَ دَرَجٰتٍۗ',
+              sumber_arab: 'Q.S. Al-Mujadilah / 58: 11',
+              pertanyaan: `Kandungan utama potongan ayat di atas yang berkaitan dengan nilai akhlak dan ${t} adalah ....`,
+              opsi: {
+                A: 'Allah Swt. akan mengangkat derajat orang-orang yang beriman dan berilmu pengetahuan',
+                B: 'Kewajiban melaksanakan ibadah haji bagi setiap muslim yang mampu secara fisik',
+                C: 'Larangan melakukan transaksi jual beli yang mengandung unsur riba dan penipuan',
+                D: 'Perintah untuk menyantuni anak yatim dan fakir miskin pada bulan Ramadan'
+              },
+              kunci: 'A',
+              pembahasan: `Q.S. Al-Mujadilah ayat 11 menegaskan kemuliaan dan tingginya derajat orang yang beriman serta berilmu pengetahuan.`
+            },
+            {
+              stimulus: `Seorang pelajar SMP menunjukkan sikap jujur, amanah, dan istikamah saat mengerjakan ujian maupun dalam pergaulan di sekolah sesuai ajaran ${t}.`,
+              teks_arab: 'إِنَّ اللّٰهَ يَأْمُرُكُمْ اَنْ تُؤَدُّوا الْاَمٰنٰتِ اِلٰٓى اَهْلِهَاۙ',
+              sumber_arab: 'Q.S. An-Nisa / 4: 58',
+              pertanyaan: `Perilaku terpuji yang mencerminkan pengamalan ayat tersebut di lingkungan sekolah adalah ....`,
+              opsi: {
+                A: 'Menyampaikan pesan atau titipan dari guru kepada teman dengan utuh tanpa dikurangi',
+                B: 'Menunda pelaksanaan salat berjamaah demi menyelesaikan permainan bersama teman',
+                C: 'Membanggakan prestasi pribadi di hadapan teman-teman agar mendapat pujian',
+                D: 'Memilih-milih teman berdasarkan status ekonomi keluarga di kelas'
+              },
+              kunci: 'A',
+              pembahasan: `Q.S. An-Nisa ayat 58 memerintahkan umat Islam untuk menyampaikan amanah kepada yang berhak menerimanya.`
+            },
+            {
+              stimulus: `Dalam fikih ibadah dan kajian ${t}, umat Islam diajarkan tata cara bersuci, salat berjamaah, serta kepedulian sosial sesuai tuntunan Rasulullah saw.`,
+              pertanyaan: `Hikmah utama pelaksanaan ibadah yang dilakukan secara ikhlas dan sesuai ketentuan syariat adalah ....`,
+              opsi: {
+                A: 'Membentuk pribadi yang disiplin, tenang hatinya, dan terhindar dari perbuatan keji serta mungkar',
+                B: 'Mendapatkan penghargaan dan pengakuan dari masyarakat sekitar tempat tinggal',
+                C: 'Menggugurkan seluruh kewajiban belajar dan bekerja mencari nafkah',
+                D: 'Membebaskan seseorang dari tanggung jawab sosial terhadap sesama manusia'
+              },
+              kunci: 'A',
+              pembahasan: `Ibadah yang dilaksanakan sesuai syariat menumbuhkan ketakwaan, kedisiplinan, dan akhlak mulia dalam kehidupan.`
+            }
+          ],
+          pgk: [
+            {
+              stimulus: `Perhatikan perilaku peserta didik dalam menerapkan nilai-nilai ${t} di lingkungan sekolah dan keluarga.`,
+              pertanyaan: `Sikap yang mencerminkan akhlak karimah dan pengamalan ajaran Islam adalah ....`,
+              opsi: [
+                'Berkata jujur dan tidak menyontek saat mengikuti asesmen di kelas',
+                'Menghormati guru serta bertutur kata santun kepada orang tua',
+                'Menyebarkan berita yang belum jelas kebenarannya di media sosial',
+                'Menjaga kebersihan masjid dan lingkungan sekolah sebagai bagian dari iman',
+                'Bersikap sombong ketika memperoleh nilai tertinggi di kelas',
+                'Mengabaikan nasihat baik dari teman sebaya'
+              ],
+              kunci: ['A', 'B', 'D'],
+              pembahasan: `Jujur, hormat kepada guru dan orang tua, serta menjaga kebersihan adalah wujud nyata akhlak terpuji dalam Islam.`
+            }
+          ],
+          bs: [
+            {
+              stimulus: `Cermati prinsip-prinsip ajaran Islam yang berkaitan dengan materi ${t} berikut ini.`,
+              pertanyaan: `Tentukan Benar atau Salah pada setiap pernyataan berikut!`,
+              pernyataan: [
+                { teks: 'Niat yang ikhlas karena Allah Swt. menjadi syarat diterimanya amal ibadah.', jawaban: 'Benar' },
+                { teks: 'Membaca Al-Qur\'an dengan tartil memperhatikan hukum tajwid termasuk adab tilawah.', jawaban: 'Benar' },
+                { teks: 'Sikap amanah hanya berlaku bagi pemimpin negara dan tidak berlaku bagi pelajar.', jawaban: 'Salah' },
+                { teks: 'Toleransi (tasamuh) berarti menghargai perbedaan tanpa mencampuradukkan akidah.', jawaban: 'Benar' },
+                { teks: 'Ghibah diperbolehkan apabila hal yang dibicarakan memang benar adanya.', jawaban: 'Salah' }
+              ],
+              pembahasan: `Ikhlas, tartil, amanah bagi setiap muslim, serta tasamuh merupakan ajaran pokok Islam, sedangkan ghibah tetap dilarang.`
+            }
+          ],
+          mj: [
+            {
+              stimulus: `Pasangkan istilah-istilah pokok dalam kajian ${t} pada lajur kiri dengan pengertian yang tepat pada lajur kanan!`,
+              pertanyaan: `Jodohkan istilah di sebelah kiri dengan maknanya yang tepat!`,
+              premis: [
+                { id: '1', teks: 'Amanah' },
+                { id: '2', teks: 'Istikamah' },
+                { id: '3', teks: 'Tasamuh' },
+                { id: '4', teks: 'Tawakal' },
+                { id: '5', teks: 'Syukur' }
+              ],
+              respon: [
+                { id: 'A', teks: 'Teguh pendirian dan konsisten dalam kebaikan' },
+                { id: 'B', teks: 'Dapat dipercaya dalam menjaga titipan dan tanggung jawab' },
+                { id: 'C', teks: 'Menyerahkan hasil usaha sepenuhnya kepada Allah Swt.' },
+                { id: 'D', teks: 'Sikap tenggang rasa dan saling menghargai sesama' },
+                { id: 'E', teks: 'Berterima kasih atas nikmat Allah Swt. dengan amal saleh' },
+                { id: 'F', teks: 'Berputus asa dari rahmat Allah Swt.' }
+              ],
+              kunci_pasangan: { '1': 'B', '2': 'A', '3': 'D', '4': 'C', '5': 'E' },
+              pembahasan: `Amanah = dapat dipercaya; Istikamah = konsisten; Tasamuh = toleransi; Tawakal = berserah diri setelah ikhtiar; Syukur = berterima kasih atas nikmat.`
+            }
+          ],
+          esai: [
+            {
+              stimulus: `Dalam kehidupan modern, pelajar SMP sering menghadapi tantangan penggunaan media sosial dan pergaulan sebaya yang berkaitan erat dengan nilai ${t}.`,
+              pertanyaan: `Jelaskan tiga contoh penerapan nyata nilai ${t} yang dapat dilakukan pelajar SMP di sekolah maupun di dunia digital beserta hikmahnya!`,
+              kunci_jawaban: `(1) Tabayyun (meneliti kebenaran informasi) sebelum membagikan berita di media sosial agar terhindar dari fitnah; (2) Bertutur kata santun dan menghindari perundungan siber (cyberbullying) untuk menjaga ukhuwah; (3) Menjaga kejujuran dan disiplin waktu belajar serta ibadah sehingga tumbuh menjadi pribadi berintegritas.`,
+              rubrik_skor: [
+                { kriteria: 'Menjelaskan 3 contoh penerapan nyata beserta hikmahnya secara runtut dan tepat.', skor: 4 },
+                { kriteria: 'Menjelaskan 2 contoh penerapan nyata beserta hikmahnya dengan jelas.', skor: 3 },
+                { kriteria: 'Menyebutkan contoh penerapan secara umum tanpa uraian hikmah.', skor: 2 },
+                { kriteria: 'Jawaban masih sangat singkat dan kurang relevan.', skor: 1 }
+              ],
+              skor_maksimal: 4
+            }
+          ]
+        };
+      }
+
+      if (/bahasa inggris/i.test(m)) {
+        return {
+          mcqs: [
+            {
+              stimulus: `Read the following short text about "${t}" for Grade ${k} Junior High School:\n"Every morning, Rani prepares her school bag carefully and checks her study schedule. She believes that good habits and discipline help students understand ${t} better and achieve their academic goals."`,
+              pertanyaan: `What is the main idea of the text above?`,
+              opsi: {
+                A: 'Rani forgets to bring her books to school every morning',
+                B: 'Good habits and discipline support students in achieving academic success',
+                C: 'Students should never make a daily study schedule at home',
+                D: 'Rani dislikes studying with her classmates in the library'
+              },
+              kunci: 'B',
+              pembahasan: `The text clearly states that good habits and discipline help students understand lessons and achieve their academic goals.`
+            },
+            {
+              stimulus: `Read the dialogue between Dimas and Sinta:\nDimas: "Excuse me, Sinta. Could you explain the key points of ${t}?"\nSinta: "Sure! Let's read the summary together and note down the important expressions."`,
+              pertanyaan: `What does Sinta express in the dialogue?`,
+              opsi: {
+                A: 'Refusing to help Dimas with his homework',
+                B: 'Willingness to help and collaborate in learning',
+                C: 'Asking for permission to leave the classroom',
+                D: 'Complaining about the difficulty of the assignment'
+              },
+              kunci: 'B',
+              pembahasan: `Sinta says "Sure! Let's read the summary together...", showing her willingness to help Dimas.`
+            },
+            {
+              stimulus: `Complete the sentence below using the appropriate grammatical structure related to ${t}:\n"The students _______ an interesting project in the science laboratory yesterday morning."`,
+              pertanyaan: `Which verb form best completes the sentence?`,
+              opsi: {
+                A: 'conduct',
+                B: 'conducts',
+                C: 'conducted',
+                D: 'conducting'
+              },
+              kunci: 'C',
+              pembahasan: `The time marker "yesterday morning" indicates Simple Past Tense, so the past verb "conducted" is correct.`
+            }
+          ],
+          pgk: [
+            {
+              stimulus: `Read the announcement:\n"Attention all Grade ${k} students! Our English Club will hold a workshop on ${t} this Friday at 2:00 PM in the School Hall. Please bring your notebook and dictionary."`,
+              pertanyaan: `Which statements are TRUE according to the announcement? (Choose more than one)`,
+              opsi: [
+                'The workshop is intended for Grade ' + k + ' students',
+                'The event will take place on Friday afternoon at 2:00 PM',
+                'Students do not need to bring any stationery or books',
+                'The venue of the workshop is the School Hall',
+                'The event will be held on Sunday morning',
+                'Only teachers are allowed to attend the workshop'
+              ],
+              kunci: ['A', 'B', 'D'],
+              pembahasan: `Based on the announcement, the workshop is for Grade ${k} students, held on Friday at 2:00 PM in the School Hall.`
+            }
+          ],
+          bs: [
+            {
+              stimulus: `Read the following sentences carefully in the context of ${t}.`,
+              pertanyaan: `Determine whether each English statement is True (Benar) or False (Salah)!`,
+              pernyataan: [
+                { teks: 'In Simple Present Tense, we add "-s" or "-es" to the verb for third-person singular subjects (he, she, it).', jawaban: 'Benar' },
+                { teks: 'The word "yesterday" is commonly used in Future Tense sentences.', jawaban: 'Salah' },
+                { teks: 'A descriptive text aims to describe a particular person, place, or thing in detail.', jawaban: 'Benar' },
+                { teks: 'Polite expressions such as "Could you please..." are used to make polite requests.', jawaban: 'Benar' },
+                { teks: 'An imperative sentence always ends with a question mark (?).', jawaban: 'Salah' }
+              ],
+              pembahasan: `Simple Present adds -s/-es for he/she/it; descriptive text describes specifics; "Could you please" is a polite request.`
+            }
+          ],
+          mj: [
+            {
+              stimulus: `Match the English expressions on the left with their appropriate functions or meanings on the right!`,
+              pertanyaan: `Match column A with column B accurately!`,
+              premis: [
+                { id: '1', teks: 'Congratulations on winning the competition!' },
+                { id: '2', teks: 'Could you lend me your dictionary, please?' },
+                { id: '3', teks: 'In my opinion, reading books broadens our knowledge.' },
+                { id: '4', teks: 'Watch out! The floor is wet.' },
+                { id: '5', teks: 'I am sorry for coming late to class.' }
+              ],
+              respon: [
+                { id: 'A', teks: 'Making a polite request' },
+                { id: 'B', teks: 'Congratulating someone' },
+                { id: 'C', teks: 'Giving a warning' },
+                { id: 'D', teks: 'Expressing an opinion' },
+                { id: 'E', teks: 'Apologizing' },
+                { id: 'F', teks: 'Asking for directions' }
+              ],
+              kunci_pasangan: { '1': 'B', '2': 'A', '3': 'D', '4': 'C', '5': 'E' },
+              pembahasan: `Each expression corresponds to congratulating (B), polite request (A), opinion (D), warning (C), and apologizing (E).`
+            }
+          ],
+          esai: [
+            {
+              stimulus: `Write a short English paragraph (3–4 sentences) describing your favorite school activity related to ${t}.`,
+              pertanyaan: `Explain why the activity is beneficial for Grade ${k} students!`,
+              kunci_jawaban: `My favorite school activity is joining the English study club. We practice speaking, reading stories, and discussing ${t} together every Friday. This activity helps us build confidence and improve our vocabulary.`,
+              rubrik_skor: [
+                { kriteria: 'Writes 3–4 grammatically clear sentences relevant to the topic.', skor: 4 },
+                { kriteria: 'Writes 2–3 sentences with minor grammatical errors.', skor: 3 },
+                { kriteria: 'Writes 1–2 simple sentences with limited vocabulary.', skor: 2 },
+                { kriteria: 'Response is incomplete or off-topic.', skor: 1 }
+              ],
+              skor_maksimal: 4
+            }
+          ]
+        };
+      }
+
+      const extraContext = fact0 ? ` (${fact0.slice(0, 140)}...)` : '';
+      return {
+        mcqs: [
+          {
+            stimulus: `Dalam pembelajaran ${m} kelas ${k} SMP pada materi ${t}${extraContext}, peserta didik mengamati fenomena serta konsep dasar yang berlaku dalam kehidupan sehari-hari.`,
+            pertanyaan: `Berdasarkan prinsip utama pada materi ${t}, pernyataan yang paling tepat menjelaskan konsep tersebut adalah ....`,
+            opsi: {
+              A: `Penerapan ${t} memerlukan pemahaman konsep dasar dan analisis hubungan sebab-akibat secara sistematis`,
+              B: `Konsep ${t} hanya berlaku secara teoretis dan tidak memiliki keterkaitan dengan kehidupan sehari-hari`,
+              C: `Pengamatan dalam materi ${t} dapat dilakukan tanpa memperhatikan fakta maupun data pendukung`,
+              D: `Seluruh gejala pada topik ${t} terjadi secara acak tanpa memiliki pola atau aturan tertentu`
+            },
+            kunci: 'A',
+            pembahasan: `Pemahaman ${t} dalam ${m} menuntut penguasaan konsep dasar serta analisis hubungan sebab-akibat berdasarkan fakta dan data.`
+          },
+          {
+            stimulus: `Sekelompok siswa kelas ${k} melakukan pengamatan dan diskusi kelompok mengenai penerapan ${t} di lingkungan sekolah dan masyarakat sekitar.`,
+            pertanyaan: `Langkah analisis yang paling tepat dilakukan siswa untuk membuktikan kebenaran konsep ${t} adalah ....`,
+            opsi: {
+              A: `Mengumpulkan data pengamatan secara objektif, membandingkan hasil, lalu menarik kesimpulan berdasarkan bukti`,
+              B: `Menyusun kesimpulan terlebih dahulu tanpa melakukan pengamatan atau studi literatur`,
+              C: `Mengabaikan perbedaan hasil temuan antaranggota kelompok agar laporan cepat selesai`,
+              D: `Menggunakan satu sumber pendapat pribadi tanpa memverifikasinya dengan teori ${m}`
+            },
+            kunci: 'A',
+            pembahasan: `Metode ilmiah dan berpikir kritis dalam ${m} mengharuskan pengumpulan data objektif sebelum menarik kesimpulan.`
+          },
+          {
+            stimulus: `Perhatikan studi kasus berikut terkait ${t}: terjadinya perubahan kondisi lingkungan memengaruhi keseimbangan proses yang sedang diamati dalam kajian ${m}${fact1 ? ' — ' + fact1.slice(0, 110) : ''}.`,
+            pertanyaan: `Dampak logis yang muncul apabila faktor utama dalam sistem ${t} mengalami gangguan adalah ....`,
+            opsi: {
+              A: `Keseimbangan sistem terganggu sehingga diperlukan upaya penyesuaian atau solusi berbasis konsep ${t}`,
+              B: `Tidak terjadi perubahan apa pun karena setiap komponen berdiri sendiri tanpa saling memengaruhi`,
+              C: `Seluruh komponen otomatis meningkat fungsinya tanpa memerlukan pengendalian`,
+              D: `Permasalahan dapat diselesaikan tanpa perlu memahami penyebab utama gangguan tersebut`
+            },
+            kunci: 'A',
+            pembahasan: `Setiap komponen dalam kajian ${t} saling berkaitan; gangguan pada faktor utama memengaruhi keseimbangan keseluruhan sistem.`
+          }
+        ],
+        pgk: [
+          {
+            stimulus: `Cermati beberapa pernyataan mengenai konsep dan penerapan materi ${t} pada mata pelajaran ${m} kelas ${k} SMP berikut ini.`,
+            pertanyaan: `Pernyataan yang benar dan sesuai dengan kaidah materi ${t} adalah .... (Pilih lebih dari satu)`,
+            opsi: [
+              `Konsep ${t} dapat dianalisis melalui pengamatan fakta dan data yang relevan`,
+              `Pemahaman terhadap ${t} membantu memecahkan permasalahan kontekstual di lingkungan sekitar`,
+              `Kajian ${t} tidak memerlukan ketelitian dalam mengidentifikasi komponen penyusunnya`,
+              `Setiap unsur dalam materi ${t} memiliki fungsi dan keterkaitan yang saling mendukung`,
+              `Kesimpulan mengenai ${t} boleh bertentangan dengan bukti empiris yang ditemukan`,
+              `Penerapan ${t} hanya bermanfaat untuk dihafalkan tanpa dipahami maknanya`
+            ],
+            kunci: ['A', 'B', 'D'],
+            pembahasan: `Pernyataan A, B, dan D sesuai dengan pendekatan ilmiah dan pemahaman konseptual Kurikulum Merdeka pada materi ${t}.`
+          }
+        ],
+        bs: [
+          {
+            stimulus: `Bacalah pernyataan-pernyataan berikut yang berkaitan dengan ruang lingkup dan penerapan ${t} dalam ${m}.`,
+            pertanyaan: `Tentukan apakah setiap pernyataan berikut bernilai Benar atau Salah!`,
+            pernyataan: [
+              { teks: `Penguasaan konsep dasar ${t} menjadi landasan untuk menganalisis permasalahan yang lebih kompleks.`, jawaban: 'Benar' },
+              { teks: `Data dan bukti nyata diperlukan untuk mendukung kesimpulan dalam kajian ${t}.`, jawaban: 'Benar' },
+              { teks: `Materi ${t} tidak memiliki hubungan dengan fenomena yang terjadi di masyarakat atau alam sekitar.`, jawaban: 'Salah' },
+              { teks: `Evaluasi dan refleksi hasil pengamatan membantu memperbaiki kekeliruan pemahaman pada topik ${t}.`, jawaban: 'Benar' },
+              { teks: `Dalam mempelajari ${t}, opini tanpa dasar lebih diutamakan daripada fakta terverifikasi.`, jawaban: 'Salah' }
+            ],
+            pembahasan: `Konsep dasar, dukungan data nyata, dan refleksi merupakan prinsip utama dalam mempelajari ${t}.`
+          }
+        ],
+        mj: [
+          {
+            stimulus: `Pasangkan tahapan dan aspek kajian dalam materi ${t} (${m}) pada kolom kiri dengan penjelasan yang sesuai pada kolom kanan!`,
+            pertanyaan: `Jodohkan setiap aspek di lajur kiri dengan pasangan yang tepat di lajur kanan!`,
+            premis: [
+              { id: '1', teks: `Identifikasi Masalah (${t})` },
+              { id: '2', teks: `Pengumpulan Data` },
+              { id: '3', teks: `Analisis Konsep` },
+              { id: '4', teks: `Penarikan Kesimpulan` },
+              { id: '5', teks: `Refleksi & Penerapan` }
+            ],
+            respon: [
+              { id: 'A', teks: 'Mencatat fakta, ukuran, atau informasi relevan secara objektif' },
+              { id: 'B', teks: 'Merumuskan pertanyaan pokok yang akan dikaji pada topik' },
+              { id: 'C', teks: 'Menghubungkan temuan dengan teori dan prinsip dasar materi' },
+              { id: 'D', teks: 'Menyusun ringkasan jawaban berdasarkan bukti yang telah diuji' },
+              { id: 'E', teks: 'Menerapkan solusi pada situasi nyata di kehidupan sehari-hari' },
+              { id: 'F', teks: 'Mengabaikan seluruh data pengamatan yang tidak sesuai keinginan' }
+            ],
+            kunci_pasangan: { '1': 'B', '2': 'A', '3': 'C', '4': 'D', '5': 'E' },
+            pembahasan: `Urutan proses berpikir ilmiah meliputi identifikasi masalah (B), pengumpulan data (A), analisis konsep (C), kesimpulan (D), dan penerapan (E).`
+          }
+        ],
+        esai: [
+          {
+            stimulus: `Dalam kehidupan sehari-hari di lingkungan sekolah maupun masyarakat, sering dijumpai permasalahan yang berkaitan langsung dengan materi ${t} pada mata pelajaran ${m}.`,
+            pertanyaan: `Analisislah satu contoh permasalahan nyata yang berkaitan dengan ${t}, kemudian jelaskan langkah penyelesaiannya berdasarkan konsep ${m} kelas ${k}!`,
+            kunci_jawaban: `Permasalahan diidentifikasi melalui pengamatan fakta di lapangan terkait ${t}, dianalisis faktor penyebabnya menggunakan konsep dasar ${m}, lalu dirumuskan solusi yang terukur, logis, dan dapat diterapkan secara berkelanjutan.`,
+            rubrik_skor: [
+              { kriteria: 'Menguraikan contoh permasalahan nyata, analisis konsep, dan langkah solusi secara lengkap dan runtut.', skor: 4 },
+              { kriteria: 'Menguraikan permasalahan dan solusi dengan benar namun analisis konsep masih singkat.', skor: 3 },
+              { kriteria: 'Hanya menyebutkan contoh permasalahan tanpa langkah penyelesaian yang jelas.', skor: 2 },
+              { kriteria: 'Jawaban masih terlalu umum dan belum mengaitkan konsep materi.', skor: 1 }
+            ],
+            skor_maksimal: 4
+          }
+        ]
+      };
+    }
+
+    function updateTotalBadge() {
+      const ids = ['jml-pg-sederhana', 'jml-pg-kompleks', 'jml-benar-salah', 'jml-menjodohkan', 'jml-esai'];
+      const total = ids.reduce((sum, id) => {
+        const val = parseInt(document.getElementById(id)?.value || '0', 10);
+        return sum + (Number.isFinite(val) && val > 0 ? val : 0);
+      }, 0);
+      const badge = document.getElementById('total-soal-badge');
+      if (badge) {
+        badge.textContent = `${total} Butir Soal`;
+      }
+    }
+
+    function collectFormMeta(silent = false) {
+      const mapelSelect = document.getElementById('mapel-select');
+      const mapelCustom = document.getElementById('mapel-custom');
+      const kelasSelect = document.getElementById('kelas-select');
+      const materiInput = document.getElementById('materi-input');
+      const kesulitanSelect = document.getElementById('kesulitan-select');
+      const instruksiInput = document.getElementById('custom-prompt-instruction');
+
+      const mapelVal = mapelSelect?.value === '__CUSTOM__'
+        ? (mapelCustom?.value || '').trim()
+        : (mapelSelect?.value || '').trim();
+      const kelasVal = (kelasSelect?.value || '').trim();
+      const materiVal = (materiInput?.value || '').trim();
+      const kesulitanVal = (kesulitanSelect?.value || '').trim();
+      const instruksiTambahan = (instruksiInput?.value || '').trim();
+
+      const jmlPgSederhana = Math.max(0, parseInt(document.getElementById('jml-pg-sederhana')?.value || '0', 10) || 0);
+      const jmlPgKompleks = Math.max(0, parseInt(document.getElementById('jml-pg-kompleks')?.value || '0', 10) || 0);
+      const jmlBenarSalah = Math.max(0, parseInt(document.getElementById('jml-benar-salah')?.value || '0', 10) || 0);
+      const jmlMenjodohkan = Math.max(0, parseInt(document.getElementById('jml-menjodohkan')?.value || '0', 10) || 0);
+      const jmlEsai = Math.max(0, parseInt(document.getElementById('jml-esai')?.value || '0', 10) || 0);
+      const totalSoal = jmlPgSederhana + jmlPgKompleks + jmlBenarSalah + jmlMenjodohkan + jmlEsai;
+
+      const pernyataanPgk = Math.max(3, Math.min(6, parseInt(document.getElementById('pernyataan-pgk')?.value || '4', 10) || 4));
+      const pernyataanBs = Math.max(3, Math.min(5, parseInt(document.getElementById('pernyataan-bs')?.value || '4', 10) || 4));
+      const premisMenjodohkan = Math.max(3, Math.min(5, parseInt(document.getElementById('premis-menjodohkan')?.value || '3', 10) || 3));
+
+      const gambarPgSederhana = Math.max(0, parseInt(document.getElementById('gambar-pg-sederhana')?.value || '0', 10) || 0);
+      const gambarPgKompleks = Math.max(0, parseInt(document.getElementById('gambar-pg-kompleks')?.value || '0', 10) || 0);
+      const gambarBenarSalah = Math.max(0, parseInt(document.getElementById('gambar-benar-salah')?.value || '0', 10) || 0);
+      const gambarMenjodohkan = Math.max(0, parseInt(document.getElementById('gambar-menjodohkan')?.value || '0', 10) || 0);
+      const gambarEsai = Math.max(0, parseInt(document.getElementById('gambar-esai')?.value || '0', 10) || 0);
+
+      const errors = [];
+      if (!mapelVal) errors.push('Mata Pelajaran wajib dipilih atau diisi.');
+      if (!kelasVal) errors.push('Kelas / Fase wajib dipilih.');
+      if (!materiVal) errors.push('Materi Pokok / Topik wajib diisi.');
+      if (!kesulitanVal) errors.push('Tingkat Kesulitan wajib dipilih.');
+      if (totalSoal <= 0) errors.push('Minimal jumlah total soal harus lebih dari 0 butir.');
+
+      const valBox = document.getElementById('validation-box');
+      const valList = document.getElementById('validation-list');
+      if (errors.length > 0) {
+        if (!silent && valBox && valList) {
+          valList.innerHTML = errors.map((err) => `<li>${escapeHtml(err)}</li>`).join('');
+          valBox.classList.remove('hidden');
+          valBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        return null;
+      }
+
+      if (valBox) valBox.classList.add('hidden');
+
+      return {
+        mapel: mapelVal,
+        kelas: kelasVal,
+        materi: materiVal,
+        kesulitan: kesulitanVal,
+        instruksiTambahan,
+        jmlPgSederhana,
+        jmlPgKompleks,
+        jmlBenarSalah,
+        jmlMenjodohkan,
+        jmlEsai,
+        totalSoal,
+        pernyataanPgk,
+        pernyataanBs,
+        premisMenjodohkan,
+        gambarPgSederhana,
+        gambarPgKompleks,
+        gambarBenarSalah,
+        gambarMenjodohkan,
+        gambarEsai
+      };
+    }
+
+    function createIllustrationDataUrl(mapel, materi, nomor, captionText = '') {
+      const seedStr = encodeURIComponent(`${captionText || materi}-${nomor}`.replace(/[^a-zA-Z0-9-]/g, '').slice(0, 32) || `soal-${nomor}`);
+      return `https://picsum.photos/seed/${seedStr}/560/320`;
+    }
+
+    function triggerQuestionImageUpload(sectionKey, index) {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'image/*';
+      fileInput.onchange = (ev) => {
+        const file = ev.target?.files?.[0];
+        if (!file || !currentGeneratedData?.[sectionKey]?.[index]) return;
+        const reader = new FileReader();
+        reader.onload = (rEv) => {
+          if (typeof rEv.target?.result === 'string') {
+            currentGeneratedData[sectionKey][index].gambar_url = rEv.target.result;
+            renderDocument();
+            switchTab(currentTab);
+            showToast('Gambar soal berhasil diperbarui.', 'success');
+          }
+        };
+        reader.readAsDataURL(file);
+      };
+      fileInput.click();
+    }
+
+    function removeQuestionImage(sectionKey, index) {
+      if (!currentGeneratedData?.[sectionKey]?.[index]) return;
+      currentGeneratedData[sectionKey][index].gambar_url = '';
+      currentGeneratedData[sectionKey][index].gambar_caption = '';
+      renderDocument();
+      switchTab(currentTab);
+      showToast('Gambar pada butir soal telah dihapus.', 'info');
+    }
+
+    async function refreshSingleQuestionRealImage(sectionKey, index) {
+      if (!currentGeneratedData?.[sectionKey]?.[index] || !currentMeta) return;
+      const q = currentGeneratedData[sectionKey][index];
+      showToast(`Mencari foto/diagram riil untuk soal no. ${q.nomor}...`, 'info');
+      const pool = await fetchRealTopicImages(`${currentMeta.materi} ${q.pertanyaan.slice(0, 35)}`, currentMeta.mapel, 8);
+      const nextImg = pool.find((item) => item.url !== q.gambar_url) || pool[0];
+      if (nextImg) {
+        q.gambar_url = nextImg.url;
+        q.gambar_caption = `Gambar ${q.nomor}. ${nextImg.caption}`;
+        renderDocument();
+        switchTab(currentTab);
+        showToast(`Gambar riil untuk soal no. ${q.nomor} berhasil dimuat.`, 'success');
+      } else {
+        showToast('Tidak ditemukan gambar lain; gunakan tombol "Pilih dari Perangkat" untuk mengunggah gambar lokal.', 'error');
+      }
+    }
+
+    async function generateQuestionsAutomatically(meta) {
+      const wikiFacts = await fetchWikipediaSummaryContext(meta.materi, meta.mapel);
+
+      const usedUrlsGlobal = new Set();
+      const resolvePerQuestionImage = async (no, stimulusText, questionText) => {
+        const specificContext = `${stimulusText || ''} ${questionText || ''}`
+          .replace(/<[^>]*>/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        const queryTopic = specificContext ? `${specificContext.slice(0, 140)} ${meta.materi}` : meta.materi;
+        const candidates = await fetchRealTopicImages(queryTopic, meta.mapel, 6);
+        const picked = candidates.find((c) => !usedUrlsGlobal.has(c.url)) || candidates[0];
+        if (picked) {
+          usedUrlsGlobal.add(picked.url);
+          return {
+            url: picked.url,
+            caption: `Gambar ${no}. ${picked.caption}`
+          };
+        }
+        return {
+          url: createIllustrationDataUrl(meta.mapel, meta.materi, no, specificContext),
+          caption: `Gambar ${no}. Ilustrasi pendukung ${meta.materi}`
+        };
+      };
+
+      const bank = buildSubjectQuestionBank(meta, wikiFacts);
+      let nomorUrut = 1;
+
+      const pg_sederhana = [];
+      for (let i = 0; i < meta.jmlPgSederhana; i++) {
+        const tpl = bank.mcqs[i % bank.mcqs.length];
+        const variasiSuffix = i >= bank.mcqs.length ? ` (Variasi Analisis #${i + 1})` : '';
+        const no = nomorUrut++;
+        const hasImg = i < meta.gambarPgSederhana;
+        const fullPertanyaan = `${tpl.pertanyaan}${variasiSuffix}`;
+        const imgAsset = hasImg ? await resolvePerQuestionImage(no, tpl.stimulus, fullPertanyaan) : null;
+        pg_sederhana.push({
+          nomor: no,
+          level_kognitif: getLevelLabelByIndex(i, meta.kesulitan),
+          indikator_soal: `Disajikan stimulus mengenai ${meta.materi}, peserta didik dapat menentukan konsep atau penyelesaian yang tepat.`,
+          stimulus: tpl.stimulus,
+          gambar_url: imgAsset ? imgAsset.url : '',
+          gambar_caption: imgAsset ? imgAsset.caption : '',
+          teks_arab: tpl.teks_arab || '',
+          sumber_arab: tpl.sumber_arab || '',
+          pertanyaan: fullPertanyaan,
+          opsi: { ...tpl.opsi },
+          kunci: tpl.kunci,
+          pembahasan: tpl.pembahasan
+        });
+      }
+
+      const pg_kompleks = [];
+      for (let i = 0; i < meta.jmlPgKompleks; i++) {
+        const tpl = bank.pgk[i % bank.pgk.length];
+        const slicedOpsi = tpl.opsi.slice(0, meta.pernyataanPgk).map((teks, idx) => ({
+          huruf: getAlphabetLabel(idx),
+          teks
+        }));
+        const validLetters = slicedOpsi.map((o) => o.huruf);
+        let kunciArr = (tpl.kunci || ['A', 'B']).filter((k) => validLetters.includes(k));
+        if (kunciArr.length < 2 && validLetters.length >= 2) {
+          kunciArr = [validLetters[0], validLetters[1]];
+        }
+        const no = nomorUrut++;
+        const hasImg = i < meta.gambarPgKompleks;
+        const imgAsset = hasImg ? await resolvePerQuestionImage(no, tpl.stimulus, tpl.pertanyaan) : null;
+        pg_kompleks.push({
+          nomor: no,
+          level_kognitif: getLevelLabelByIndex(i + 1, meta.kesulitan),
+          indikator_soal: `Disajikan beberapa pernyataan terkait ${meta.materi}, peserta didik dapat memilih lebih dari satu jawaban yang benar.`,
+          stimulus: tpl.stimulus,
+          gambar_url: imgAsset ? imgAsset.url : '',
+          gambar_caption: imgAsset ? imgAsset.caption : '',
+          teks_arab: tpl.teks_arab || '',
+          sumber_arab: tpl.sumber_arab || '',
+          pertanyaan: tpl.pertanyaan,
+          opsi: slicedOpsi,
+          kunci: kunciArr,
+          pembahasan: tpl.pembahasan
+        });
+      }
+
+      const benar_salah = [];
+      for (let i = 0; i < meta.jmlBenarSalah; i++) {
+        const tpl = bank.bs[i % bank.bs.length];
+        const slicedPernyataan = tpl.pernyataan.slice(0, meta.pernyataanBs).map((item, idx) => ({
+          huruf: getAlphabetLabel(idx),
+          teks: item.teks,
+          jawaban: item.jawaban
+        }));
+        const no = nomorUrut++;
+        const hasImg = i < meta.gambarBenarSalah;
+        const imgAsset = hasImg ? await resolvePerQuestionImage(no, tpl.stimulus, tpl.pertanyaan) : null;
+        benar_salah.push({
+          nomor: no,
+          level_kognitif: getLevelLabelByIndex(i + 2, meta.kesulitan),
+          indikator_soal: `Disajikan tabel pernyataan mengenai ${meta.materi}, peserta didik dapat mengevaluasi nilai kebenaran setiap pernyataan.`,
+          stimulus: tpl.stimulus,
+          gambar_url: imgAsset ? imgAsset.url : '',
+          gambar_caption: imgAsset ? imgAsset.caption : '',
+          teks_arab: tpl.teks_arab || '',
+          sumber_arab: tpl.sumber_arab || '',
+          pertanyaan: tpl.pertanyaan,
+          pernyataan: slicedPernyataan,
+          pembahasan: tpl.pembahasan
+        });
+      }
+
+      const menjodohkan = [];
+      for (let i = 0; i < meta.jmlMenjodohkan; i++) {
+        const tpl = bank.mj[i % bank.mj.length];
+        const countPremis = meta.premisMenjodohkan;
+        const premisSlice = tpl.premis.slice(0, countPremis).map((p, idx) => ({
+          id: String(idx + 1),
+          teks: p.teks
+        }));
+        const usedTargetIds = new Set(premisSlice.map((p) => tpl.kunci_pasangan[p.id]));
+        const distractor = tpl.respon.find((r) => !usedTargetIds.has(r.id)) || tpl.respon[tpl.respon.length - 1];
+        const selectedResponRaw = [
+          ...premisSlice.map((p) => tpl.respon.find((r) => r.id === tpl.kunci_pasangan[p.id])).filter(Boolean),
+          ...(distractor ? [distractor] : [])
+        ];
+        const responMapped = selectedResponRaw.map((r, idx) => ({
+          oldId: r.id,
+          id: getAlphabetLabel(idx),
+          teks: r.teks
+        }));
+        const kunciPasangan = {};
+        premisSlice.forEach((p) => {
+          const origTargetId = tpl.kunci_pasangan[p.id];
+          const mapped = responMapped.find((rm) => rm.oldId === origTargetId);
+          kunciPasangan[p.id] = mapped ? mapped.id : 'A';
+        });
+        const no = nomorUrut++;
+        const hasImg = i < meta.gambarMenjodohkan;
+        const imgAsset = hasImg ? await resolvePerQuestionImage(no, tpl.stimulus, tpl.pertanyaan) : null;
+        menjodohkan.push({
+          nomor: no,
+          level_kognitif: getLevelLabelByIndex(i + 1, meta.kesulitan),
+          indikator_soal: `Disajikan premis dan pilihan respon tentang ${meta.materi}, peserta didik dapat memasangkannya secara akurat.`,
+          stimulus: tpl.stimulus,
+          gambar_url: imgAsset ? imgAsset.url : '',
+          gambar_caption: imgAsset ? imgAsset.caption : '',
+          pertanyaan: tpl.pertanyaan,
+          premis: premisSlice,
+          respon: responMapped.map(({ id, teks }) => ({ id, teks })),
+          kunci_pasangan: kunciPasangan,
+          pembahasan: tpl.pembahasan
+        });
+      }
+
+      const esai = [];
+      for (let i = 0; i < meta.jmlEsai; i++) {
+        const tpl = bank.esai[i % bank.esai.length];
+        const no = nomorUrut++;
+        const hasImg = i < meta.gambarEsai;
+        const imgAsset = hasImg ? await resolvePerQuestionImage(no, tpl.stimulus, tpl.pertanyaan) : null;
+        esai.push({
+          nomor: no,
+          level_kognitif: 'L3 (C5)',
+          indikator_soal: `Disajikan studi kasus tentang ${meta.materi}, peserta didik dapat menganalisis dan menyusun solusi sistematis.`,
+          stimulus: tpl.stimulus,
+          gambar_url: imgAsset ? imgAsset.url : '',
+          gambar_caption: imgAsset ? imgAsset.caption : '',
+          teks_arab: tpl.teks_arab || '',
+          sumber_arab: tpl.sumber_arab || '',
+          pertanyaan: tpl.pertanyaan,
+          kunci_jawaban: tpl.kunci_jawaban,
+          rubrik_skor: tpl.rubrik_skor,
+          skor_maksimal: tpl.skor_maksimal || 4
+        });
+      }
+
+      return { pg_sederhana, pg_kompleks, benar_salah, menjodohkan, esai };
+    }
+
+    function buildStructuredPromptFromMeta(meta) {
+      const isPai = /agama islam|pai/i.test(meta.mapel);
+      const isBahasInggris = /bahasa inggris/i.test(meta.mapel);
+      const bagianList = [];
+      if (meta.jmlPgSederhana > 0) {
+        const imgNote = meta.gambarPgSederhana > 0 ? ` (sertakan deskripsi ilustrasi gambar pada ${meta.gambarPgSederhana} soal pertama)` : '';
+        bagianList.push(`- BAGIAN A (Pilihan Ganda Sederhana): ${meta.jmlPgSederhana} butir soal dengan 4 opsi jawaban (A, B, C, D) dan 1 jawaban benar${imgNote}.`);
+      }
+      if (meta.jmlPgKompleks > 0) {
+        const imgNote = meta.gambarPgKompleks > 0 ? ` (sertakan deskripsi ilustrasi gambar pada ${meta.gambarPgKompleks} soal pertama)` : '';
+        bagianList.push(`- BAGIAN B (Pilihan Ganda Kompleks): ${meta.jmlPgKompleks} butir soal dengan masing-masing ${meta.pernyataanPgk} opsi pernyataan (A–${getAlphabetLabel(meta.pernyataanPgk - 1)}) dan lebih dari 1 jawaban benar${imgNote}.`);
+      }
+      if (meta.jmlBenarSalah > 0) {
+        const imgNote = meta.gambarBenarSalah > 0 ? ` (sertakan deskripsi ilustrasi gambar pada ${meta.gambarBenarSalah} soal pertama)` : '';
+        bagianList.push(`- BAGIAN C (Benar / Salah): ${meta.jmlBenarSalah} butir soal dengan masing-masing ${meta.pernyataanBs} pernyataan berabjad (A–${getAlphabetLabel(meta.pernyataanBs - 1)}) beserta keterangan Benar atau Salah${imgNote}.`);
+      }
+      if (meta.jmlMenjodohkan > 0) {
+        const imgNote = meta.gambarMenjodohkan > 0 ? ` (sertakan deskripsi ilustrasi gambar pada ${meta.gambarMenjodohkan} soal pertama)` : '';
+        bagianList.push(`- BAGIAN D (Menjodohkan): ${meta.jmlMenjodohkan} butir soal dengan ${meta.premisMenjodohkan} premis (1–${meta.premisMenjodohkan}) dan ${meta.premisMenjodohkan + 1} pilihan respon (A–${getAlphabetLabel(meta.premisMenjodohkan)})${imgNote}.`);
+      }
+      if (meta.jmlEsai > 0) {
+        const imgNote = meta.gambarEsai > 0 ? ` (sertakan deskripsi ilustrasi gambar pada ${meta.gambarEsai} soal pertama)` : '';
+        bagianList.push(`- BAGIAN E (Uraian / Esai): ${meta.jmlEsai} butir soal analitis lengkap dengan kunci jawaban ideal dan rubrik penskoran${imgNote}.`);
+      }
+
+      const kesulitanClean = String(meta.kesulitan || '').replace(/\s*\([^)]*\)/g, '').trim();
+      const extraInstructionBlock = meta.instruksiTambahan
+        ? `\nINSTRUKSI KHUSUS DARI GURU:\n${meta.instruksiTambahan}\n`
+        : '';
+
+      return `Buatkan paket naskah soal SMP Kurikulum Merdeka (Fase D) yang bermutu tinggi, kontekstual, akurat secara keilmuan sesuai mata pelajaran ${meta.mapel}, dan tidak mengulang kalimat dengan spesifikasi berikut:
+- Referensi Tautan Sumber Gemini: ${GEMINI_SHARE_REFERENCE_URL}
+- Mata Pelajaran: ${meta.mapel}
+- Kelas / Fase: Kelas ${meta.kelas} SMP (Fase D)
+- Materi Pokok / Topik: ${meta.materi}
+- Tingkat Kesulitan: ${kesulitanClean}
+- Total Butir Soal: ${meta.totalSoal} butir soal berurutan dari nomor 1 sampai ${meta.totalSoal}
+${extraInstructionBlock}
+KOMPOSISI BENTUK SOAL:
+${bagianList.join('\n')}
+
+ATURAN PROSEDUR PENYUSUNAN SOAL:
+1. Perintah ini adalah SPESIFIKASI/INSTRUKSI pembuatan soal — JANGAN menyalin teks perintah ini menjadi isi soal; susunlah butir-butir soal baru yang orisinal dan akurat sesuai kompetensi mata pelajaran ${meta.mapel}.
+2. Awali setiap soal dengan stimulus/konteks singkat yang relevan dengan materi ${meta.materi}${isBahasInggris ? ' dalam Bahasa Inggris yang natural' : ''}${isPai ? ' serta sertakan kutipan ayat Al-Qur\'an atau Hadis berharakat lengkap beserta sumber surat/ayatnya pada soal yang relevan' : ''}.
+3. Sertakan kunci jawaban yang terverifikasi benar, pembahasan logis, indikator soal, dan rubrik penskoran yang lengkap untuk setiap butir soal.`;
+    }
+
+    async function fetchQuestionsFromGeminiApi(meta, prompt) {
+      const apiKey = (document.getElementById('gemini-api-key')?.value || DEFAULT_GEMINI_API_KEY).trim();
+      if (!apiKey) {
+        throw new Error('Gemini API Key belum tersedia.');
+      }
+
+      const isPai = /agama islam|pai/i.test(meta.mapel);
+      const isBahasInggris = /bahasa inggris/i.test(meta.mapel);
+      const systemInstruction = `Anda adalah pakar penyusun naskah asesmen SMP Kurikulum Merdeka (Fase D) Indonesia untuk mata pelajaran ${meta.mapel}.
+TUGAS UTAMA: Perlakukan input pengguna sebagai INSTRUKSI/SPESIFIKASI penyusunan soal dengan mengacu pada standar kualitas pada tautan referensi ${GEMINI_SHARE_REFERENCE_URL}. Jangan pernah menjadikan teks prompt/instruksi sebagai teks soal.
+Susun soal-soal baru yang bermutu tinggi, kontekstual, akurat secara keilmuan sesuai kaidah ${meta.mapel}, bebas dari pengulangan kalimat, dan sesuai tingkat perkembangan siswa SMP kelas ${meta.kelas}.
+${isPai ? 'Untuk Pendidikan Agama Islam, sertakan kutipan ayat Al-Qur\'an atau Hadis berharakat lengkap dan jelas beserta sumber surat/ayat pada butir soal yang relevan.' : ''}
+${isBahasInggris ? 'Untuk Bahasa Inggris, gunakan bahasa Inggris yang natural dan sesuai jenjang SMP Fase D untuk stimulus, pertanyaan, dan pilihan jawaban.' : ''}
+Pastikan penomoran soal berurutan mulai dari 1 hingga ${meta.totalSoal} (urutan: PG Sederhana -> PG Kompleks -> Benar/Salah -> Menjodohkan -> Esai) dengan jumlah butir persis sesuai komposisi yang diminta.
+Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa Inggris/Indonesia jika butir soal tersebut membutuhkan ilustrasi gambar, atau string kosong "" jika tidak butuh gambar.`;
+
+      const payload = {
+        systemInstruction: { parts: [{ text: systemInstruction }] },
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.7,
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: 'OBJECT',
+            properties: {
+              pg_sederhana: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    nomor: { type: 'INTEGER' },
+                    level_kognitif: { type: 'STRING' },
+                    indikator_soal: { type: 'STRING' },
+                    stimulus: { type: 'STRING' },
+                    gambar_kata_kunci: { type: 'STRING' },
+                    teks_arab: { type: 'STRING' },
+                    sumber_arab: { type: 'STRING' },
+                    pertanyaan: { type: 'STRING' },
+                    opsi_a: { type: 'STRING' },
+                    opsi_b: { type: 'STRING' },
+                    opsi_c: { type: 'STRING' },
+                    opsi_d: { type: 'STRING' },
+                    kunci: { type: 'STRING' },
+                    pembahasan: { type: 'STRING' }
+                  },
+                  required: ['nomor', 'pertanyaan', 'opsi_a', 'opsi_b', 'opsi_c', 'opsi_d', 'kunci', 'pembahasan']
+                }
+              },
+              pg_kompleks: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    nomor: { type: 'INTEGER' },
+                    level_kognitif: { type: 'STRING' },
+                    indikator_soal: { type: 'STRING' },
+                    stimulus: { type: 'STRING' },
+                    gambar_kata_kunci: { type: 'STRING' },
+                    teks_arab: { type: 'STRING' },
+                    sumber_arab: { type: 'STRING' },
+                    pertanyaan: { type: 'STRING' },
+                    opsi: { type: 'ARRAY', items: { type: 'STRING' } },
+                    kunci: { type: 'ARRAY', items: { type: 'STRING' } },
+                    pembahasan: { type: 'STRING' }
+                  },
+                  required: ['nomor', 'pertanyaan', 'opsi', 'kunci', 'pembahasan']
+                }
+              },
+              benar_salah: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    nomor: { type: 'INTEGER' },
+                    level_kognitif: { type: 'STRING' },
+                    indikator_soal: { type: 'STRING' },
+                    stimulus: { type: 'STRING' },
+                    gambar_kata_kunci: { type: 'STRING' },
+                    teks_arab: { type: 'STRING' },
+                    sumber_arab: { type: 'STRING' },
+                    pertanyaan: { type: 'STRING' },
+                    pernyataan: {
+                      type: 'ARRAY',
+                      items: {
+                        type: 'OBJECT',
+                        properties: {
+                          teks: { type: 'STRING' },
+                          jawaban: { type: 'STRING' }
+                        },
+                        required: ['teks', 'jawaban']
+                      }
+                    },
+                    pembahasan: { type: 'STRING' }
+                  },
+                  required: ['nomor', 'pertanyaan', 'pernyataan', 'pembahasan']
+                }
+              },
+              menjodohkan: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    nomor: { type: 'INTEGER' },
+                    level_kognitif: { type: 'STRING' },
+                    indikator_soal: { type: 'STRING' },
+                    stimulus: { type: 'STRING' },
+                    gambar_kata_kunci: { type: 'STRING' },
+                    pertanyaan: { type: 'STRING' },
+                    premis: {
+                      type: 'ARRAY',
+                      items: {
+                        type: 'OBJECT',
+                        properties: {
+                          id: { type: 'STRING' },
+                          teks: { type: 'STRING' }
+                        },
+                        required: ['id', 'teks']
+                      }
+                    },
+                    respon: {
+                      type: 'ARRAY',
+                      items: {
+                        type: 'OBJECT',
+                        properties: {
+                          id: { type: 'STRING' },
+                          teks: { type: 'STRING' }
+                        },
+                        required: ['id', 'teks']
+                      }
+                    },
+                    pasangan: {
+                      type: 'ARRAY',
+                      items: {
+                        type: 'OBJECT',
+                        properties: {
+                          premis_id: { type: 'STRING' },
+                          respon_id: { type: 'STRING' }
+                        },
+                        required: ['premis_id', 'respon_id']
+                      }
+                    },
+                    pembahasan: { type: 'STRING' }
+                  },
+                  required: ['nomor', 'pertanyaan', 'premis', 'respon', 'pasangan', 'pembahasan']
+                }
+              },
+              esai: {
+                type: 'ARRAY',
+                items: {
+                  type: 'OBJECT',
+                  properties: {
+                    nomor: { type: 'INTEGER' },
+                    level_kognitif: { type: 'STRING' },
+                    indikator_soal: { type: 'STRING' },
+                    stimulus: { type: 'STRING' },
+                    gambar_kata_kunci: { type: 'STRING' },
+                    teks_arab: { type: 'STRING' },
+                    sumber_arab: { type: 'STRING' },
+                    pertanyaan: { type: 'STRING' },
+                    kunci_jawaban: { type: 'STRING' },
+                    rubrik_skor: {
+                      type: 'ARRAY',
+                      items: {
+                        type: 'OBJECT',
+                        properties: {
+                          kriteria: { type: 'STRING' },
+                          skor: { type: 'INTEGER' }
+                        },
+                        required: ['kriteria', 'skor']
+                      }
+                    },
+                    skor_maksimal: { type: 'INTEGER' }
+                  },
+                  required: ['nomor', 'pertanyaan', 'kunci_jawaban', 'rubrik_skor']
+                }
+              }
+            },
+            required: ['pg_sederhana', 'pg_kompleks', 'benar_salah', 'menjodohkan', 'esai']
+          }
+        }
+      };
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 35000);
+      let resp;
+      try {
+        resp = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          }
+        );
+      } finally {
+        clearTimeout(timeoutId);
+      }
+
+      if (!resp.ok) {
+        const errData = await resp.json().catch(() => ({}));
+        throw new Error(errData?.error?.message || `HTTP ${resp.status}`);
+      }
+
+      const resJson = await resp.json();
+      const rawText = resJson?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      if (!rawText) throw new Error('Respons Gemini AI kosong.');
+
+      const parsed = JSON.parse(rawText);
+      const usedUrls = new Set();
+
+      const attachImageIfRequested = async (item, index, neededImgCount, fallbackNo) => {
+        // Hanya tampilkan gambar jika jumlah gambar yang diminta pada bagian soal ini > 0 dan indeks berada dalam batas tersebut
+        const shouldHaveImg = neededImgCount > 0 && index < neededImgCount;
+        if (!shouldHaveImg) return { url: '', caption: '' };
+        const qKey = (item.gambar_kata_kunci || `${item.stimulus || ''} ${item.pertanyaan || ''} ${meta.materi}`).slice(0, 140);
+        const candidates = await fetchRealTopicImages(qKey, meta.mapel, 5);
+        const picked = candidates.find((c) => !usedUrls.has(c.url)) || candidates[0];
+        if (picked) {
+          usedUrls.add(picked.url);
+          return { url: picked.url, caption: `Gambar ${fallbackNo}. ${item.gambar_kata_kunci || picked.caption}` };
+        }
+        return {
+          url: createIllustrationDataUrl(meta.mapel, meta.materi, fallbackNo, qKey),
+          caption: `Gambar ${fallbackNo}. Ilustrasi ${meta.materi}`
+        };
+      };
+
+      let runningNo = 1;
+
+      const pg_sederhana = [];
+      const rawPg = Array.isArray(parsed.pg_sederhana) ? parsed.pg_sederhana : [];
+      for (let i = 0; i < rawPg.length; i++) {
+        const it = rawPg[i];
+        const no = runningNo++;
+        const imgAsset = await attachImageIfRequested(it, i, meta.gambarPgSederhana, no);
+        pg_sederhana.push({
+          nomor: no,
+          level_kognitif: it.level_kognitif || getLevelLabelByIndex(i, meta.kesulitan),
+          indikator_soal: it.indikator_soal || `Disajikan konteks materi ${meta.materi}, peserta didik dapat menentukan jawaban yang tepat.`,
+          stimulus: it.stimulus || '',
+          gambar_url: imgAsset.url,
+          gambar_caption: imgAsset.caption,
+          teks_arab: it.teks_arab || '',
+          sumber_arab: it.sumber_arab || '',
+          pertanyaan: it.pertanyaan || '',
+          opsi: {
+            A: it.opsi_a || '',
+            B: it.opsi_b || '',
+            C: it.opsi_c || '',
+            D: it.opsi_d || ''
+          },
+          kunci: String(it.kunci || 'A').trim().toUpperCase().charAt(0),
+          pembahasan: it.pembahasan || ''
+        });
+      }
+
+      const pg_kompleks = [];
+      const rawPgk = Array.isArray(parsed.pg_kompleks) ? parsed.pg_kompleks : [];
+      for (let i = 0; i < rawPgk.length; i++) {
+        const it = rawPgk[i];
+        const no = runningNo++;
+        const imgAsset = await attachImageIfRequested(it, i, meta.gambarPgKompleks, no);
+        const normOpsi = normalizePgkOptions(it.opsi || []);
+        pg_kompleks.push({
+          nomor: no,
+          level_kognitif: it.level_kognitif || getLevelLabelByIndex(i + 1, meta.kesulitan),
+          indikator_soal: it.indikator_soal || `Disajikan pernyataan mengenai ${meta.materi}, peserta didik dapat memilih lebih dari satu jawaban benar.`,
+          stimulus: it.stimulus || '',
+          gambar_url: imgAsset.url,
+          gambar_caption: imgAsset.caption,
+          teks_arab: it.teks_arab || '',
+          sumber_arab: it.sumber_arab || '',
+          pertanyaan: it.pertanyaan || '',
+          opsi: normOpsi,
+          kunci: Array.isArray(it.kunci) ? it.kunci.map((k) => String(k).trim().toUpperCase().charAt(0)) : ['A', 'B'],
+          pembahasan: it.pembahasan || ''
+        });
+      }
+
+      const benar_salah = [];
+      const rawBs = Array.isArray(parsed.benar_salah) ? parsed.benar_salah : [];
+      for (let i = 0; i < rawBs.length; i++) {
+        const it = rawBs[i];
+        const no = runningNo++;
+        const imgAsset = await attachImageIfRequested(it, i, meta.gambarBenarSalah, no);
+        benar_salah.push({
+          nomor: no,
+          level_kognitif: it.level_kognitif || getLevelLabelByIndex(i + 2, meta.kesulitan),
+          indikator_soal: it.indikator_soal || `Disajikan tabel pernyataan tentang ${meta.materi}, peserta didik dapat mengevaluasi nilai kebenarannya.`,
+          stimulus: it.stimulus || '',
+          gambar_url: imgAsset.url,
+          gambar_caption: imgAsset.caption,
+          teks_arab: it.teks_arab || '',
+          sumber_arab: it.sumber_arab || '',
+          pertanyaan: it.pertanyaan || '',
+          pernyataan: normalizeBsStatements(it.pernyataan || []),
+          pembahasan: it.pembahasan || ''
+        });
+      }
+
+      const menjodohkan = [];
+      const rawMj = Array.isArray(parsed.menjodohkan) ? parsed.menjodohkan : [];
+      for (let i = 0; i < rawMj.length; i++) {
+        const it = rawMj[i];
+        const no = runningNo++;
+        const imgAsset = await attachImageIfRequested(it, i, meta.gambarMenjodohkan, no);
+        const kunciMap = {};
+        if (Array.isArray(it.pasangan)) {
+          it.pasangan.forEach((p) => {
+            if (p.premis_id && p.respon_id) {
+              kunciMap[String(p.premis_id).trim()] = String(p.respon_id).trim().toUpperCase();
+            }
+          });
+        }
+        menjodohkan.push({
+          nomor: no,
+          level_kognitif: it.level_kognitif || getLevelLabelByIndex(i + 1, meta.kesulitan),
+          indikator_soal: it.indikator_soal || `Disajikan premis dan respon mengenai ${meta.materi}, peserta didik dapat memasangkannya secara akurat.`,
+          stimulus: it.stimulus || '',
+          gambar_url: imgAsset.url,
+          gambar_caption: imgAsset.caption,
+          pertanyaan: it.pertanyaan || '',
+          premis: Array.isArray(it.premis) ? it.premis : [],
+          respon: Array.isArray(it.respon) ? it.respon : [],
+          kunci_pasangan: kunciMap,
+          pembahasan: it.pembahasan || ''
+        });
+      }
+
+      const esai = [];
+      const rawEsai = Array.isArray(parsed.esai) ? parsed.esai : [];
+      for (let i = 0; i < rawEsai.length; i++) {
+        const it = rawEsai[i];
+        const no = runningNo++;
+        const imgAsset = await attachImageIfRequested(it, i, meta.gambarEsai, no);
+        esai.push({
+          nomor: no,
+          level_kognitif: it.level_kognitif || 'L3 (C5)',
+          indikator_soal: it.indikator_soal || `Disajikan studi kasus tentang ${meta.materi}, peserta didik dapat menganalisis dan merumuskan solusi.`,
+          stimulus: it.stimulus || '',
+          gambar_url: imgAsset.url,
+          gambar_caption: imgAsset.caption,
+          teks_arab: it.teks_arab || '',
+          sumber_arab: it.sumber_arab || '',
+          pertanyaan: it.pertanyaan || '',
+          kunci_jawaban: it.kunci_jawaban || '',
+          rubrik_skor: Array.isArray(it.rubrik_skor) ? it.rubrik_skor : [],
+          skor_maksimal: it.skor_maksimal || 4
+        });
+      }
+
+      const totalReceived = pg_sederhana.length + pg_kompleks.length + benar_salah.length + menjodohkan.length + esai.length;
+      if (totalReceived === 0) {
+        throw new Error('Gemini AI belum mengembalikan butir soal yang valid.');
+      }
+
+      return { pg_sederhana, pg_kompleks, benar_salah, menjodohkan, esai };
+    }
+
+    async function handleGenerateSoal(e) {
+      if (e) e.preventDefault();
+      const meta = collectFormMeta(false);
+      if (!meta) return;
+
+      currentMeta = meta;
+      const promptText = buildStructuredPromptFromMeta(meta);
+      const btnGenerate = document.getElementById('btn-generate');
+      const emptyState = document.getElementById('empty-state');
+      const loadingState = document.getElementById('loading-state');
+      const docContainer = document.getElementById('document-container');
+      const quizContainer = document.getElementById('quiz-container');
+      const toolbar = document.getElementById('result-toolbar');
+
+      if (btnGenerate) btnGenerate.disabled = true;
+      updateGeminiSyncBadge('Menyusun via Gemini...', 'amber');
+      emptyState?.classList.add('hidden');
+      docContainer?.classList.add('hidden');
+      quizContainer?.classList.add('hidden');
+      toolbar?.classList.add('hidden');
+      loadingState?.classList.remove('hidden');
+      startLoadingTimer();
+
+      try {
+        let structured = null;
+        let toastMsg = '';
+        try {
+          structured = await fetchQuestionsFromGeminiApi(meta, promptText);
+          updateGeminiSyncBadge('Tersusun (Gemini AI)', 'emerald');
+          toastMsg = `Paket soal ${meta.mapel} (${meta.totalSoal} butir) berhasil disusun oleh Gemini AI!`;
+        } catch (aiErr) {
+          console.warn('Fallback ke generator internal:', aiErr);
+          structured = await generateQuestionsAutomatically(meta);
+          updateGeminiSyncBadge('Tersusun (Mode Standar)', 'emerald');
+          toastMsg = `Paket soal ${meta.mapel} (${meta.totalSoal} butir) selesai disusun!`;
+        }
+
+        stopLoadingTimer();
+        currentGeneratedData = structured;
+        currentTab = 'semua';
+
+        loadingState?.classList.add('hidden');
+        renderGeneratedExamWorkspace(toastMsg);
+      } catch (err) {
+        stopLoadingTimer();
+        loadingState?.classList.add('hidden');
+        updateGeminiSyncBadge('Gagal Menyusun', 'rose');
+        if (currentGeneratedData) {
+          toolbar?.classList.remove('hidden');
+          docContainer?.classList.remove('hidden');
+        } else {
+          emptyState?.classList.remove('hidden');
+        }
+        showToast(err.message || 'Terjadi kendala saat menyusun soal.', 'error');
+      } finally {
+        if (btnGenerate) btnGenerate.disabled = false;
+      }
+    }
+
+    function renderGeneratedExamWorkspace(toastMessage = '') {
+      document.getElementById('empty-state')?.classList.add('hidden');
+      document.getElementById('result-toolbar')?.classList.remove('hidden');
+      const docEl = document.getElementById('document-container');
+      if (docEl) {
+        docEl.classList.remove('hidden');
+      }
+      renderDocument();
+      switchTab(currentTab || 'semua');
+      if (docEl) {
+        docEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      if (toastMessage) {
+        showToast(toastMessage, 'success');
+      }
+    }
+
+    /* ==========================================================================
+       3. LOGO KOP SURAT & RESET WORKSPACE
+       ========================================================================== */
+    function loadSavedLogos() {
+      try {
+        logoPemkabData = localStorage.getItem(STORAGE_LOGO_PEMKAB) || '';
+        logoSekolahData = localStorage.getItem(STORAGE_LOGO_SEKOLAH) || '';
+      } catch (e) {}
+      updateLogoPreviewSlots();
+    }
+
+    function saveLogoToStorage(side, dataUrl) {
+      if (side === 'pemkab') {
+        logoPemkabData = dataUrl;
+        try {
+          if (dataUrl) localStorage.setItem(STORAGE_LOGO_PEMKAB, dataUrl);
+          else localStorage.removeItem(STORAGE_LOGO_PEMKAB);
+        } catch (e) {}
+      } else {
+        logoSekolahData = dataUrl;
+        try {
+          if (dataUrl) localStorage.setItem(STORAGE_LOGO_SEKOLAH, dataUrl);
+          else localStorage.removeItem(STORAGE_LOGO_SEKOLAH);
+        } catch (e) {}
+      }
+      updateLogoPreviewSlots();
+      if (currentGeneratedData && currentMeta) {
+        renderDocument();
+      }
+    }
+
+    function handleLogoFileUpload(side, file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (typeof ev.target?.result === 'string') {
+          saveLogoToStorage(side, ev.target.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function updateLogoPreviewSlots() {
+      const thumbPemkab = document.getElementById('thumb-logo-pemkab');
+      const thumbSekolah = document.getElementById('thumb-logo-sekolah');
+      const btnClearPemkab = document.getElementById('btn-clear-logo-pemkab');
+      const btnClearSekolah = document.getElementById('btn-clear-logo-sekolah');
+      const slotPemkab = document.getElementById('kop-logo-pemkab-slot');
+      const slotSekolah = document.getElementById('kop-logo-sekolah-slot');
+
+      if (thumbPemkab) {
+        thumbPemkab.innerHTML = logoPemkabData
+          ? `<img src="${escapeHtml(logoPemkabData)}" alt="Pemkab" class="w-full h-full object-contain" />`
+          : 'Kiri';
+      }
+      if (btnClearPemkab) btnClearPemkab.classList.toggle('hidden', !logoPemkabData);
+
+      if (thumbSekolah) {
+        thumbSekolah.innerHTML = logoSekolahData
+          ? `<img src="${escapeHtml(logoSekolahData)}" alt="Sekolah" class="w-full h-full object-contain" />`
+          : 'Kanan';
+      }
+      if (btnClearSekolah) btnClearSekolah.classList.toggle('hidden', !logoSekolahData);
+
+      if (slotPemkab) {
+        slotPemkab.innerHTML = logoPemkabData
+          ? `<img src="${escapeHtml(logoPemkabData)}" alt="Logo Pemkab" style="width: 62px; height: 62px; object-fit: contain; margin: 0 auto;" />`
+          : `<button type="button" onclick="document.getElementById('input-logo-pemkab').click()" class="no-print text-[10px] text-slate-400 hover:text-blue-900 border border-dashed border-slate-300 rounded-lg px-2 py-3 cursor-pointer">+ Logo Pemkab</button>`;
+      }
+      if (slotSekolah) {
+        slotSekolah.innerHTML = logoSekolahData
+          ? `<img src="${escapeHtml(logoSekolahData)}" alt="Logo Sekolah" style="width: 62px; height: 62px; object-fit: contain; margin: 0 auto;" />`
+          : `<button type="button" onclick="document.getElementById('input-logo-sekolah').click()" class="no-print text-[10px] text-slate-400 hover:text-blue-900 border border-dashed border-slate-300 rounded-lg px-2 py-3 cursor-pointer">+ Logo Sekolah</button>`;
+      }
+    }
+
+    function resetAllWorkspace() {
+      const form = document.getElementById('soal-form');
+      if (form) form.reset();
+
+      const mapelCustom = document.getElementById('mapel-custom');
+      if (mapelCustom) {
+        mapelCustom.value = '';
+        mapelCustom.classList.add('hidden');
+      }
+
+      const valBox = document.getElementById('validation-box');
+      if (valBox) valBox.classList.add('hidden');
+
+      currentGeneratedData = null;
+      currentMeta = null;
+      currentTab = 'semua';
+
+      document.getElementById('result-toolbar')?.classList.add('hidden');
+      document.getElementById('document-container')?.classList.add('hidden');
+      document.getElementById('quiz-container')?.classList.add('hidden');
+      document.getElementById('loading-state')?.classList.add('hidden');
+      document.getElementById('empty-state')?.classList.remove('hidden');
+
+      updateTotalBadge();
+      updateLogoPreviewSlots();
+      updateGeminiSyncBadge('Siap Menyusun', 'emerald');
+      showToast('Formulir dan lembar kerja telah dikosongkan. Siap menyusun soal baru.', 'info');
+    }
+
+    /* ==========================================================================
+       4. PERENDER KOMPONEN DOKUMEN (KOP SURAT, ARAB PAI, KISI-KISI)
+       ========================================================================== */
+    function getCognitiveBadgeHtml() {
+      return '';
+    }
+
+    function renderArabicBlockHtml(teksArab, sumberArab) {
+      if (!teksArab || !String(teksArab).trim()) return '';
+      return `
+        <div style="margin: 6px 0; padding: 6px 10px; background-color: #f8fafc; border-right: 3px solid #0f172a;">
+          <div class="arabic-text">${escapeHtml(teksArab)}</div>
+          ${sumberArab ? `<div style="font-size: 9pt; font-style: italic; color: #334155; text-align: left;">(${escapeHtml(sumberArab)})</div>` : ''}
+        </div>
+      `;
+    }
+
+    function renderQuestionImageBlockHtml(q, sectionKey, idx) {
+      if (q.gambar_url) {
+        const fallbackTopicTag = encodeURIComponent(
+          String(currentMeta?.materi || currentMeta?.mapel || 'education')
+            .split(/\s+/)[0]
+            .replace(/[^a-zA-Z0-9]/g, '') || 'education'
+        );
+        const emergencyPhotoUrl = `https://loremflickr.com/560/320/${fallbackTopicTag},school/all?lock=${q.nomor * 17}`;
+        return `
+          <div style="margin: 6px 0 8px 0; text-align: center;">
+            <img src="${escapeHtml(q.gambar_url)}" alt="Gambar Soal ${q.nomor}" onerror="if(!this.dataset.retried){this.dataset.retried='1';this.src='${emergencyPhotoUrl}';}" style="max-width: 380px; max-height: 230px; width: auto; height: auto; border: 1px solid #cbd5e1; border-radius: 6px; margin: 0 auto; display: block; object-fit: contain; background: #f8fafc;" />
+            ${q.gambar_caption ? `<div style="font-size: 9pt; font-style: italic; color: #475569; margin-top: 4px;">${escapeHtml(q.gambar_caption)}</div>` : ''}
+            <div class="no-print" style="margin-top: 4px;">
+              <button type="button" onclick="refreshSingleQuestionRealImage('${sectionKey}', ${idx})" class="px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 text-[10px] font-semibold cursor-pointer mr-1">Cari Gambar Riil Lain</button>
+              <button type="button" onclick="triggerQuestionImageUpload('${sectionKey}', ${idx})" class="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 text-[10px] font-semibold cursor-pointer mr-1">Pilih dari Perangkat</button>
+              <button type="button" onclick="removeQuestionImage('${sectionKey}', ${idx})" class="px-2 py-0.5 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[10px] font-semibold cursor-pointer">Hapus</button>
+            </div>
+          </div>
+        `;
+      }
+      // Jangan tampilkan gambar maupun tombol penyisipan gambar jika pengguna tidak memilih gambar pada bagian soal ini
+      const requestedMap = {
+        pg_sederhana: currentMeta?.gambarPgSederhana || 0,
+        pg_kompleks: currentMeta?.gambarPgKompleks || 0,
+        benar_salah: currentMeta?.gambarBenarSalah || 0,
+        menjodohkan: currentMeta?.gambarMenjodohkan || 0,
+        esai: currentMeta?.gambarEsai || 0
+      };
+      if ((requestedMap[sectionKey] || 0) <= 0) {
+        return '';
+      }
+      return `
+        <div class="no-print" style="margin: 3px 0 4px 0;">
+          <button type="button" onclick="refreshSingleQuestionRealImage('${sectionKey}', ${idx})" class="px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 text-[10px] font-semibold cursor-pointer mr-1">+ Sisipkan Gambar Riil</button>
+          <button type="button" onclick="triggerQuestionImageUpload('${sectionKey}', ${idx})" class="px-2 py-0.5 rounded bg-slate-50 hover:bg-slate-100 text-slate-600 border border-dashed border-slate-300 text-[10px] font-medium cursor-pointer">+ Dari Perangkat</button>
+        </div>
+      `;
+    }
+
+    function renderKopAndIdentityHtml(meta, subTitleDoc = '') {
+      const leftLogoHtml = logoPemkabData
+        ? `<img src="${escapeHtml(logoPemkabData)}" alt="Logo Pemkab" style="width: 62px; height: 62px; object-fit: contain; margin: 0 auto;" />`
+        : '';
+      const rightLogoHtml = logoSekolahData
+        ? `<img src="${escapeHtml(logoSekolahData)}" alt="Logo Sekolah" style="width: 62px; height: 62px; object-fit: contain; margin: 0 auto;" />`
+        : '';
+
+      return `
+        <table class="kop-header-table">
+          <colgroup>
+            <col style="width: 14%;" />
+            <col style="width: 72%;" />
+            <col style="width: 14%;" />
+          </colgroup>
+          <tr>
+            <td style="text-align: center;">${leftLogoHtml}</td>
+            <td style="text-align: center; line-height: 1.28;">
+              <div style="font-size: 12pt; font-weight: bold; letter-spacing: 0.4px;">PEMERINTAH KABUPATEN SITUBONDO</div>
+              <div style="font-size: 15pt; font-weight: bold; letter-spacing: 0.6px;">SMP NEGERI 3 BESUKI</div>
+              <div style="font-size: 9.5pt;">Jalan Gunung Ringgit Besuki, Situbondo, Jawa Timur 68356</div>
+              <div style="font-size: 9pt; font-style: italic;">Laman www.smpn3besuki.sch.id E-Mail : admin@smpn3besuki.sch.id</div>
+            </td>
+            <td style="text-align: center;">${rightLogoHtml}</td>
+          </tr>
+        </table>
+
+        <div style="text-align: center; margin-bottom: 10px;">
+          <div contenteditable="true" onblur="editableJudulAsesmen = this.innerText.trim() || editableJudulAsesmen" title="Klik untuk mengubah judul asesmen" style="font-size: 12pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.3px;">
+            ${escapeHtml(subTitleDoc || editableJudulAsesmen)}
+          </div>
+          <div style="font-size: 10.5pt; font-weight: bold;">KURIKULUM MERDEKA — FASE D</div>
+        </div>
+
+        <table class="identitas-table">
+          <colgroup>
+            <col style="width: 18%;" />
+            <col style="width: 2%;" />
+            <col style="width: 32%;" />
+            <col style="width: 18%;" />
+            <col style="width: 2%;" />
+            <col style="width: 28%;" />
+          </colgroup>
+          <tr>
+            <td><strong>Mata Pelajaran</strong></td>
+            <td>:</td>
+            <td>${escapeHtml(meta.mapel)}</td>
+            <td><strong>Nama Siswa</strong></td>
+            <td>:</td>
+            <td>..........................................</td>
+          </tr>
+          <tr>
+            <td><strong>Kelas / Fase</strong></td>
+            <td>:</td>
+            <td>Kelas ${escapeHtml(meta.kelas)} SMP (Fase D)</td>
+            <td><strong>Nomor Peserta</strong></td>
+            <td>:</td>
+            <td>..........................................</td>
+          </tr>
+          <tr>
+            <td><strong>Materi Pokok</strong></td>
+            <td>:</td>
+            <td>${escapeHtml(meta.materi)}</td>
+            <td><strong>Alokasi Waktu</strong></td>
+            <td>:</td>
+            <td contenteditable="true" onblur="editableAlokasiWaktu = this.innerText.trim() || editableAlokasiWaktu">${escapeHtml(editableAlokasiWaktu)}</td>
+          </tr>
+        </table>
+      `;
+    }
+
+    function renderDocument() {
+      if (!currentGeneratedData || !currentMeta) return;
+      const d = currentGeneratedData;
+      const m = currentMeta;
+      const container = document.getElementById('document-container');
+
+      let html = '';
+
+      /* ======================================================================
+         BAGIAN 1: NASKAH SOAL UTAMA
+         ====================================================================== */
+      html += `<div id="doc-section-naskah">`;
+      html += renderKopAndIdentityHtml(m, editableJudulAsesmen);
+
+      html += `
+        <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; padding: 7px 10px; margin-bottom: 14px; font-size: 10pt;">
+          <strong>PETUNJUK UMUM:</strong>
+          <ol style="margin: 3px 0 0 18px; padding: 0;">
+            <li>Berdoalah sebelum mengerjakan soal dan tuliskan identitas Anda pada kolom yang tersedia.</li>
+            <li>Bacalah setiap stimulus bacaan, tabel, ayat, atau gambar dengan cermat sebelum menjawab.</li>
+            <li>Kerjakan terlebih dahulu soal-soal yang dianggap paling mudah dengan teliti dan jujur.</li>
+          </ol>
+        </div>
+      `;
+
+      // A. Pilihan Ganda Sederhana
+      if (d.pg_sederhana.length > 0) {
+        html += `
+          <div style="font-size: 11pt; font-weight: bold; margin: 12px 0 6px 0; text-transform: uppercase;">
+            A. Pilihan Ganda Sederhana
+          </div>
+          <div style="font-size: 10pt; font-style: italic; margin-bottom: 8px;">
+            Pilihlah satu jawaban yang paling tepat (A, B, C, atau D)!
+          </div>
+        `;
+        [...d.pg_sederhana].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+          const origIdx = d.pg_sederhana.indexOf(q);
+          const opsi = q.opsi || {};
+          html += `
+            <div class="soal-block">
+              <table class="soal-table">
+                <colgroup>
+                  <col style="width: 26px;" />
+                  <col style="width: auto;" />
+                </colgroup>
+                <tr>
+                  <td style="font-weight: bold;">${q.nomor}.</td>
+                  <td>
+                    ${q.stimulus ? `<div style="margin-bottom: 4px; text-align: justify;">${formatRichText(q.stimulus)}</div>` : ''}
+                    ${renderQuestionImageBlockHtml(q, 'pg_sederhana', origIdx)}
+                    ${renderArabicBlockHtml(q.teks_arab, q.sumber_arab)}
+                    <div style="text-align: justify;">${formatRichText(q.pertanyaan)}${getCognitiveBadgeHtml()}</div>
+                    <table class="opsi-table">
+                      <colgroup>
+                        <col style="width: 22px;" />
+                        <col style="width: auto;" />
+                      </colgroup>
+                      ${['A', 'B', 'C', 'D'].map((huruf) => `
+                        <tr>
+                          <td>${huruf}.</td>
+                          <td>${formatRichText(opsi[huruf] || '')}</td>
+                        </tr>
+                      `).join('')}
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          `;
+        });
+      }
+
+      // B. Pilihan Ganda Kompleks
+      if (d.pg_kompleks.length > 0) {
+        html += `
+          <div style="font-size: 11pt; font-weight: bold; margin: 14px 0 6px 0; text-transform: uppercase;">
+            B. Pilihan Ganda Kompleks
+          </div>
+          <div style="font-size: 10pt; font-style: italic; margin-bottom: 8px;">
+            Berilah tanda centang (✓) atau lingkari lebih dari satu huruf jawaban (A, B, C, dst.) yang benar!
+          </div>
+        `;
+        [...d.pg_kompleks].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+          const origIdx = d.pg_kompleks.indexOf(q);
+          const opsiList = normalizePgkOptions(q.opsi);
+          html += `
+            <div class="soal-block">
+              <table class="soal-table">
+                <colgroup>
+                  <col style="width: 26px;" />
+                  <col style="width: auto;" />
+                </colgroup>
+                <tr>
+                  <td style="font-weight: bold;">${q.nomor}.</td>
+                  <td>
+                    ${q.stimulus ? `<div style="margin-bottom: 4px; text-align: justify;">${formatRichText(q.stimulus)}</div>` : ''}
+                    ${renderQuestionImageBlockHtml(q, 'pg_kompleks', origIdx)}
+                    ${renderArabicBlockHtml(q.teks_arab, q.sumber_arab)}
+                    <div style="text-align: justify;">${formatRichText(q.pertanyaan)}${getCognitiveBadgeHtml()}</div>
+                    <table class="opsi-table">
+                      <colgroup>
+                        <col style="width: 24px;" />
+                        <col style="width: 22px;" />
+                        <col style="width: auto;" />
+                      </colgroup>
+                      ${opsiList.map((op) => `
+                        <tr>
+                          <td style="text-align: left; white-space: nowrap;">&#9744;</td>
+                          <td style="font-weight: bold; white-space: nowrap;">${op.huruf}.</td>
+                          <td style="text-align: justify;">${formatRichText(op.teks)}</td>
+                        </tr>
+                      `).join('')}
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          `;
+        });
+      }
+
+      // C. Benar / Salah (Tabel AKM Sejajar Presisi)
+      if (d.benar_salah.length > 0) {
+        html += `
+          <div style="font-size: 11pt; font-weight: bold; margin: 14px 0 6px 0; text-transform: uppercase;">
+            C. Benar / Salah (Format AKM)
+          </div>
+          <div style="font-size: 10pt; font-style: italic; margin-bottom: 8px;">
+            Berilah tanda centang (✓) pada kolom <strong>Benar</strong> atau <strong>Salah</strong> untuk setiap pernyataan berikut!
+          </div>
+        `;
+        [...d.benar_salah].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+          const origIdx = d.benar_salah.indexOf(q);
+          const stmtList = normalizeBsStatements(q.pernyataan);
+          html += `
+            <div class="soal-block">
+              <table class="soal-table">
+                <colgroup>
+                  <col style="width: 26px;" />
+                  <col style="width: auto;" />
+                </colgroup>
+                <tr>
+                  <td style="font-weight: bold;">${q.nomor}.</td>
+                  <td>
+                    ${q.stimulus ? `<div style="margin-bottom: 4px; text-align: justify;">${formatRichText(q.stimulus)}</div>` : ''}
+                    ${renderQuestionImageBlockHtml(q, 'benar_salah', origIdx)}
+                    ${renderArabicBlockHtml(q.teks_arab, q.sumber_arab)}
+                    <div style="text-align: justify;">${formatRichText(q.pertanyaan)}${getCognitiveBadgeHtml()}</div>
+                    <table class="akm-grid-table">
+                      <colgroup>
+                        <col style="width: 74%;" />
+                        <col style="width: 13%;" />
+                        <col style="width: 13%;" />
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th style="text-align: left;">Pernyataan</th>
+                          <th>Benar</th>
+                          <th>Salah</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${stmtList.map((st) => `
+                          <tr>
+                            <td>
+                              <table class="pernyataan-inner-table">
+                                <colgroup>
+                                  <col style="width: 22px;" />
+                                  <col style="width: auto;" />
+                                </colgroup>
+                                <tr>
+                                  <td style="font-weight: bold;">${st.huruf}.</td>
+                                  <td style="text-align: justify;">${formatRichText(st.teks)}</td>
+                                </tr>
+                              </table>
+                            </td>
+                            <td style="text-align: center;">&#9744;</td>
+                            <td style="text-align: center;">&#9744;</td>
+                          </tr>
+                        `).join('')}
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          `;
+        });
+      }
+
+      // D. Menjodohkan (Format AKM)
+      if (d.menjodohkan.length > 0) {
+        html += `
+          <div style="font-size: 11pt; font-weight: bold; margin: 14px 0 6px 0; text-transform: uppercase;">
+            D. Menjodohkan (Format AKM)
+          </div>
+          <div style="font-size: 10pt; font-style: italic; margin-bottom: 8px;">
+            Pasangkan premis pada lajur kiri dengan pilihan respon yang tepat pada lajur kanan!
+          </div>
+        `;
+        [...d.menjodohkan].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+          const origIdx = d.menjodohkan.indexOf(q);
+          const premisList = Array.isArray(q.premis) ? q.premis : [];
+          const responList = Array.isArray(q.respon) ? q.respon : [];
+          const maxRows = Math.max(premisList.length, responList.length);
+          let rowsHtml = '';
+          for (let r = 0; r < maxRows; r++) {
+            const p = premisList[r];
+            const resItem = responList[r];
+            rowsHtml += `
+              <tr>
+                <td>
+                  ${p ? `<strong>${escapeHtml(p.id || String(r + 1))}.</strong> ${formatRichText(p.teks || '')}` : ''}
+                </td>
+                <td style="text-align: center;">${p ? '( ..... )' : ''}</td>
+                <td>
+                  ${resItem ? `<strong>${escapeHtml(resItem.id || getAlphabetLabel(r))}.</strong> ${formatRichText(resItem.teks || '')}` : ''}
+                </td>
+              </tr>
+            `;
+          }
+
+          html += `
+            <div class="soal-block">
+              <table class="soal-table">
+                <colgroup>
+                  <col style="width: 26px;" />
+                  <col style="width: auto;" />
+                </colgroup>
+                <tr>
+                  <td style="font-weight: bold;">${q.nomor}.</td>
+                  <td>
+                    ${q.stimulus ? `<div style="margin-bottom: 4px; text-align: justify;">${formatRichText(q.stimulus)}</div>` : ''}
+                    ${renderQuestionImageBlockHtml(q, 'menjodohkan', origIdx)}
+                    <div style="text-align: justify;">${formatRichText(q.pertanyaan)}${getCognitiveBadgeHtml()}</div>
+                    <table class="akm-grid-table">
+                      <colgroup>
+                        <col style="width: 44%;" />
+                        <col style="width: 12%;" />
+                        <col style="width: 44%;" />
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th>Premis / Pernyataan</th>
+                          <th>Pasangan</th>
+                          <th>Pilihan Respon</th>
+                        </tr>
+                      </thead>
+                      <tbody>${rowsHtml}</tbody>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          `;
+        });
+      }
+
+      // E. Esai / Uraian HOTS
+      if (d.esai.length > 0) {
+        html += `
+          <div style="font-size: 11pt; font-weight: bold; margin: 14px 0 6px 0; text-transform: uppercase;">
+            E. Uraian / Esai Analitis (HOTS)
+          </div>
+          <div style="font-size: 10pt; font-style: italic; margin-bottom: 8px;">
+            Jawablah pertanyaan-pertanyaan berikut dengan uraian yang jelas, sistematis, dan logis!
+          </div>
+        `;
+        [...d.esai].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+          const origIdx = d.esai.indexOf(q);
+          html += `
+            <div class="soal-block">
+              <table class="soal-table">
+                <colgroup>
+                  <col style="width: 26px;" />
+                  <col style="width: auto;" />
+                </colgroup>
+                <tr>
+                  <td style="font-weight: bold;">${q.nomor}.</td>
+                  <td>
+                    ${q.stimulus ? `<div style="margin-bottom: 4px; text-align: justify;">${formatRichText(q.stimulus)}</div>` : ''}
+                    ${renderQuestionImageBlockHtml(q, 'esai', origIdx)}
+                    ${renderArabicBlockHtml(q.teks_arab, q.sumber_arab)}
+                    <div style="text-align: justify;">${formatRichText(q.pertanyaan)}${getCognitiveBadgeHtml()}</div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          `;
+        });
+      }
+      html += `</div>`;
+
+      /* ======================================================================
+         BAGIAN 2: KUNCI JAWABAN, PEMBAHASAN & RUBRIK PENSKORAN
+         ====================================================================== */
+      html += `<div id="doc-section-kunci" class="page-break-before" style="margin-top: 28px; padding-top: 18px; border-top: 2px dashed #94a3b8;">`;
+      html += renderKopAndIdentityHtml(m, 'KUNCI JAWABAN, PEMBAHASAN, & RUBRIK PENSKORAN');
+
+      if (d.pg_sederhana.length > 0) {
+        html += `<div style="font-weight: bold; margin: 10px 0 5px 0;">A. Kunci Pilihan Ganda Sederhana (Skor @ 1)</div>`;
+        html += `<table class="akm-grid-table"><thead><tr><th style="width: 55px;">No.</th><th style="width: 70px;">Kunci</th><th style="text-align: left;">Pembahasan</th></tr></thead><tbody>`;
+        [...d.pg_sederhana].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+          html += `<tr><td style="text-align: center; font-weight: bold;">${q.nomor}</td><td style="text-align: center; font-weight: bold;">${escapeHtml(q.kunci)}</td><td>${formatRichText(q.pembahasan || '')}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+      }
+
+      if (d.pg_kompleks.length > 0) {
+        html += `<div style="font-weight: bold; margin: 12px 0 5px 0;">B. Kunci Pilihan Ganda Kompleks (Skor @ 2)</div>`;
+        html += `<table class="akm-grid-table"><thead><tr><th style="width: 55px;">No.</th><th style="width: 110px;">Kunci Benar</th><th style="text-align: left;">Pembahasan</th></tr></thead><tbody>`;
+        [...d.pg_kompleks].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+          const kunciArr = Array.isArray(q.kunci) ? q.kunci : [q.kunci];
+          html += `<tr><td style="text-align: center; font-weight: bold;">${q.nomor}</td><td style="text-align: center; font-weight: bold;">${escapeHtml(kunciArr.join(', '))}</td><td>${formatRichText(q.pembahasan || '')}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+      }
+
+      if (d.benar_salah.length > 0) {
+        html += `<div style="font-weight: bold; margin: 12px 0 5px 0;">C. Kunci Benar / Salah (Skor @ 2)</div>`;
+        html += `<table class="akm-grid-table"><thead><tr><th style="width: 55px;">No.</th><th style="width: 210px;">Kunci Pernyataan</th><th style="text-align: left;">Pembahasan</th></tr></thead><tbody>`;
+        [...d.benar_salah].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+          const stmts = normalizeBsStatements(q.pernyataan);
+          const kunciStr = stmts.map((s) => `${s.huruf}: ${s.jawaban}`).join(' | ');
+          html += `<tr><td style="text-align: center; font-weight: bold;">${q.nomor}</td><td style="font-weight: bold;">${escapeHtml(kunciStr)}</td><td>${formatRichText(q.pembahasan || '')}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+      }
+
+      if (d.menjodohkan.length > 0) {
+        html += `<div style="font-weight: bold; margin: 12px 0 5px 0;">D. Kunci Menjodohkan (Skor @ 3)</div>`;
+        html += `<table class="akm-grid-table"><thead><tr><th style="width: 55px;">No.</th><th style="width: 180px;">Pasangan Tepat</th><th style="text-align: left;">Pembahasan</th></tr></thead><tbody>`;
+        [...d.menjodohkan].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+          const kp = q.kunci_pasangan || {};
+          const pairText = Object.entries(kp).map(([k, v]) => `${k} → ${v}`).join(', ');
+          html += `<tr><td style="text-align: center; font-weight: bold;">${q.nomor}</td><td style="font-weight: bold;">${escapeHtml(pairText)}</td><td>${formatRichText(q.pembahasan || '')}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+      }
+
+      if (d.esai.length > 0) {
+        html += `<div style="font-weight: bold; margin: 12px 0 5px 0;">E. Pedoman Penskoran &amp; Kunci Uraian / Esai</div>`;
+        html += `<table class="akm-grid-table"><thead><tr><th style="width: 55px;">No.</th><th style="text-align: left;">Kunci Jawaban Ideal &amp; Rubrik Skor</th><th style="width: 75px;">Skor Maks</th></tr></thead><tbody>`;
+        [...d.esai].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+          const rubrik = Array.isArray(q.rubrik_skor) ? q.rubrik_skor : [];
+          const rubrikHtml = rubrik.length > 0
+            ? `<ul style="margin: 4px 0 0 16px; padding: 0; font-size: 9.5pt;">${rubrik.map((r) => `<li>Skor ${r.skor}: ${escapeHtml(r.kriteria)}</li>`).join('')}</ul>`
+            : '';
+          html += `
+            <tr>
+              <td style="text-align: center; font-weight: bold;">${q.nomor}</td>
+              <td>
+                <div><strong>Kunci Jawaban:</strong> ${formatRichText(q.kunci_jawaban || '')}</div>
+                ${rubrikHtml}
+              </td>
+              <td style="text-align: center; font-weight: bold;">${q.skor_maksimal || 4}</td>
+            </tr>
+          `;
+        });
+        html += `</tbody></table>`;
+      }
+      html += `</div>`;
+
+      /* ======================================================================
+         BAGIAN 3: KISI-KISI & KARTU SOAL
+         ====================================================================== */
+      const allItems = [
+        ...d.pg_sederhana.map((q) => ({ ...q, bentuk: 'PG Sederhana', kunciRingkas: q.kunci })),
+        ...d.pg_kompleks.map((q) => ({ ...q, bentuk: 'PG Kompleks', kunciRingkas: (Array.isArray(q.kunci) ? q.kunci : [q.kunci]).join(', ') })),
+        ...d.benar_salah.map((q) => ({ ...q, bentuk: 'Benar/Salah', kunciRingkas: normalizeBsStatements(q.pernyataan).map((s) => `${s.huruf}:${s.jawaban[0]}`).join(', ') })),
+        ...d.menjodohkan.map((q) => ({ ...q, bentuk: 'Menjodohkan', kunciRingkas: Object.entries(q.kunci_pasangan || {}).map(([k, v]) => `${k}-${v}`).join(', ') })),
+        ...d.esai.map((q) => ({ ...q, bentuk: 'Uraian/Esai', kunciRingkas: q.kunci_jawaban || 'Terlampir pada pedoman penskoran' }))
+      ].sort((a, b) => a.nomor - b.nomor);
+
+      html += `<div id="doc-section-kisikisi" class="page-break-before" style="margin-top: 28px; padding-top: 18px; border-top: 2px dashed #94a3b8;">`;
+      html += renderKopAndIdentityHtml(m, 'KISI-KISI PENULISAN SOAL & KARTU SOAL');
+
+      html += `<div style="font-weight: bold; margin: 8px 0 6px 0; font-size: 11pt;">I. TABEL KISI-KISI PENULISAN SOAL</div>`;
+      html += `
+        <table class="akm-grid-table">
+          <thead>
+            <tr>
+              <th style="width: 45px;">No.</th>
+              <th style="width: 18%;">Materi Pokok</th>
+              <th style="text-align: left;">Indikator Soal</th>
+              <th style="width: 14%;">Level Kognitif</th>
+              <th style="width: 15%;">Bentuk Soal</th>
+              <th style="width: 60px;">No. Soal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${allItems.map((it, i) => `
+              <tr>
+                <td style="text-align: center;">${i + 1}</td>
+                <td>${escapeHtml(m.materi)}</td>
+                <td>${formatRichText(it.indikator_soal || `Disajikan konteks materi ${m.materi}, peserta didik dapat menyelesaikan permasalahan dengan tepat.`)}</td>
+                <td style="text-align: center;">${escapeHtml(it.level_kognitif || 'L2 (C3)')}</td>
+                <td style="text-align: center;">${escapeHtml(it.bentuk)}</td>
+                <td style="text-align: center; font-weight: bold;">${it.nomor}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+
+      html += `<div style="font-weight: bold; margin: 18px 0 6px 0; font-size: 11pt;">II. KARTU SOAL PER BUTIR</div>`;
+      allItems.forEach((it) => {
+        html += `
+          <table class="akm-grid-table soal-block" style="margin-bottom: 10px;">
+            <colgroup>
+              <col style="width: 24%;" />
+              <col style="width: 26%;" />
+              <col style="width: 24%;" />
+              <col style="width: 26%;" />
+            </colgroup>
+            <tr>
+              <th colspan="4" style="text-align: left; background-color: #e2e8f0;">KARTU SOAL NOMOR ${it.nomor} — ${escapeHtml(it.bentuk.toUpperCase())}</th>
+            </tr>
+            <tr>
+              <td><strong>Mata Pelajaran</strong></td>
+              <td>${escapeHtml(m.mapel)}</td>
+              <td><strong>Kelas / Fase</strong></td>
+              <td>Kelas ${escapeHtml(m.kelas)} SMP (Fase D)</td>
+            </tr>
+            <tr>
+              <td><strong>Materi Pokok</strong></td>
+              <td>${escapeHtml(m.materi)}</td>
+              <td><strong>Level Kognitif</strong></td>
+              <td>${escapeHtml(it.level_kognitif || 'L2 (C3)')}</td>
+            </tr>
+            <tr>
+              <td><strong>Indikator Soal</strong></td>
+              <td colspan="3">${formatRichText(it.indikator_soal || '-')}</td>
+            </tr>
+            <tr>
+              <td colspan="4">
+                <strong>Rumusan Butir Soal:</strong><br />
+                ${it.stimulus ? `<div style="margin-top: 3px;">${formatRichText(it.stimulus)}</div>` : ''}
+                <div style="margin-top: 3px;">${formatRichText(it.pertanyaan)}</div>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Kunci Jawaban</strong></td>
+              <td colspan="3"><strong>${formatRichText(it.kunciRingkas)}</strong></td>
+            </tr>
+          </table>
+        `;
+      });
+      html += `</div>`;
+
+      /* ======================================================================
+         BAGIAN 4: ANALISIS KOGNITIF & TELAAH INSTRUMEN
+         ====================================================================== */
+      let countL1 = 0;
+      let countL2 = 0;
+      let countL3 = 0;
+      allItems.forEach((it) => {
+        const lv = String(it.level_kognitif || '');
+        if (/L1|C1|C2/i.test(lv)) countL1++;
+        else if (/L3|C4|C5|C6/i.test(lv)) countL3++;
+        else countL2++;
+      });
+      const totalAll = Math.max(1, allItems.length);
+      const pctL1 = Math.round((countL1 / totalAll) * 100);
+      const pctL2 = Math.round((countL2 / totalAll) * 100);
+      const pctL3 = Math.round((countL3 / totalAll) * 100);
+      const totalSkorMaks =
+        d.pg_sederhana.length * 1 +
+        d.pg_kompleks.length * 2 +
+        d.benar_salah.length * 2 +
+        d.menjodohkan.length * 3 +
+        d.esai.reduce((acc, q) => acc + (parseInt(q.skor_maksimal, 10) || 4), 0);
+
+      html += `
+        <div id="doc-section-analisis" class="no-print" style="margin-top: 28px; padding-top: 18px; border-top: 2px dashed #94a3b8; font-family: 'Inter', sans-serif;">
+          <h3 class="text-base font-bold text-slate-900 mb-3">Analisis Proporsi Kognitif &amp; Kualitas Instrumen</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="text-[11px] text-slate-500">Total Butir Soal</div>
+              <div class="text-lg font-extrabold text-slate-900">${allItems.length} Butir</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="text-[11px] text-slate-500">Total Skor Maksimal</div>
+              <div class="text-lg font-extrabold text-blue-950">${totalSkorMaks} Poin</div>
+            </div>
+            <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
+              <div class="text-[11px] text-amber-800">Porsi HOTS (L3 / C4–C6)</div>
+              <div class="text-lg font-extrabold text-amber-900">${countL3} Soal (${pctL3}%)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+              <div class="text-[11px] text-emerald-800">Variasi Bentuk AKM</div>
+              <div class="text-lg font-extrabold text-emerald-900">${[d.pg_sederhana.length, d.pg_kompleks.length, d.benar_salah.length, d.menjodohkan.length, d.esai.length].filter((n) => n > 0).length} Bentuk</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between font-semibold text-slate-700 mb-1">
+                <span>Level 1 (L1 / C1–C2: Pengetahuan &amp; Pemahaman)</span>
+                <span>${countL1} soal (${pctL1}%)</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-slate-200 overflow-hidden">
+                <div class="h-full bg-sky-600" style="width: ${pctL1}%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between font-semibold text-slate-700 mb-1">
+                <span>Level 2 (L2 / C3: Aplikasi &amp; Penerapan Konsep)</span>
+                <span>${countL2} soal (${pctL2}%)</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-slate-200 overflow-hidden">
+                <div class="h-full bg-indigo-600" style="width: ${pctL2}%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between font-semibold text-slate-700 mb-1">
+                <span>Level 3 (L3 / C4–C6: Penalaran, Analisis &amp; Evaluasi HOTS)</span>
+                <span>${countL3} soal (${pctL3}%)</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-slate-200 overflow-hidden">
+                <div class="h-full bg-amber-500" style="width: ${pctL3}%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    /* ==========================================================================
+       5. NAVIGASI TAB & MODE KUIS INTERAKTIF
+       ========================================================================== */
+    function switchTab(tabName) {
+      currentTab = tabName;
+      const tabIds = ['semua', 'naskah', 'kunci', 'kisikisi', 'analisis', 'kuis'];
+      tabIds.forEach((id) => {
+        const btn = document.getElementById(`tab-${id}`);
+        if (!btn) return;
+        if (id === tabName) {
+          btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-950 text-white transition cursor-pointer';
+        } else if (id === 'kuis') {
+          btn.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer';
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
+        }
+      });
+
+      const docContainer = document.getElementById('document-container');
+      const quizContainer = document.getElementById('quiz-container');
+
+      if (tabName === 'kuis') {
+        docContainer.classList.add('hidden');
+        quizContainer.classList.remove('hidden');
+        renderInteractiveQuiz();
+        return;
+      }
+
+      quizContainer.classList.add('hidden');
+      docContainer.classList.remove('hidden');
+
+      const secNaskah = document.getElementById('doc-section-naskah');
+      const secKunci = document.getElementById('doc-section-kunci');
+      const secKisi = document.getElementById('doc-section-kisikisi');
+      const secAnalisis = document.getElementById('doc-section-analisis');
+
+      if (secNaskah) secNaskah.classList.toggle('hidden', tabName !== 'semua' && tabName !== 'naskah');
+      if (secKunci) secKunci.classList.toggle('hidden', tabName !== 'semua' && tabName !== 'kunci');
+      if (secKisi) secKisi.classList.toggle('hidden', tabName !== 'semua' && tabName !== 'kisikisi');
+      if (secAnalisis) secAnalisis.classList.toggle('hidden', tabName !== 'semua' && tabName !== 'analisis');
+    }
+
+    function renderInteractiveQuiz() {
+      if (!currentGeneratedData || !currentMeta) return;
+      const d = currentGeneratedData;
+      const quizContainer = document.getElementById('quiz-container');
+
+      let html = `
+        <div class="border-b border-slate-200 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-900">SIMULASI CBT / KUIS INTERAKTIF</span>
+            <h3 class="text-base font-bold text-slate-900 mt-1">${escapeHtml(currentMeta.mapel)} — Kelas ${escapeHtml(currentMeta.kelas)} SMP</h3>
+            <p class="text-xs text-slate-500">Topik: ${escapeHtml(currentMeta.materi)}</p>
+          </div>
+          <div id="quiz-score-banner" class="hidden px-4 py-2 rounded-xl bg-blue-950 text-white text-xs font-bold"></div>
+        </div>
+        <div class="space-y-5">
+      `;
+
+      [...d.pg_sederhana].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+        const opsi = q.opsi || {};
+        html += `
+          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2.5" id="quiz-card-${q.nomor}">
+            <div class="text-xs font-bold text-blue-950">Soal No. ${q.nomor} • Pilihan Ganda</div>
+            ${q.stimulus ? `<p class="text-sm text-slate-700 leading-relaxed">${formatRichText(q.stimulus)}</p>` : ''}
+            ${renderArabicBlockHtml(q.teks_arab, q.sumber_arab)}
+            <p class="text-sm font-semibold text-slate-900">${formatRichText(q.pertanyaan)}</p>
+            <div class="space-y-1.5">
+              ${['A', 'B', 'C', 'D'].map((h) => `
+                <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-blue-50/40 cursor-pointer text-sm">
+                  <input type="radio" name="quiz-pg-${q.nomor}" value="${h}" class="mt-1" />
+                  <span><strong>${h}.</strong> ${formatRichText(opsi[h] || '')}</span>
+                </label>
+              `).join('')}
+            </div>
+            <div id="quiz-feedback-${q.nomor}" class="hidden text-xs p-2.5 rounded-lg"></div>
+          </div>
+        `;
+      });
+
+      [...d.pg_kompleks].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+        const opsiList = normalizePgkOptions(q.opsi);
+        html += `
+          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2.5" id="quiz-card-${q.nomor}">
+            <div class="text-xs font-bold text-indigo-900">Soal No. ${q.nomor} • Pilihan Ganda Kompleks (Pilih &gt;1)</div>
+            ${q.stimulus ? `<p class="text-sm text-slate-700 leading-relaxed">${formatRichText(q.stimulus)}</p>` : ''}
+            ${renderArabicBlockHtml(q.teks_arab, q.sumber_arab)}
+            <p class="text-sm font-semibold text-slate-900">${formatRichText(q.pertanyaan)}</p>
+            <div class="space-y-1.5">
+              ${opsiList.map((op) => `
+                <label class="flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-indigo-50/40 cursor-pointer text-sm">
+                  <input type="checkbox" name="quiz-pgk-${q.nomor}" value="${op.huruf}" class="mt-1 shrink-0" />
+                  <span class="font-bold shrink-0 w-5">${op.huruf}.</span>
+                  <span class="flex-1">${formatRichText(op.teks)}</span>
+                </label>
+              `).join('')}
+            </div>
+            <div id="quiz-feedback-${q.nomor}" class="hidden text-xs p-2.5 rounded-lg"></div>
+          </div>
+        `;
+      });
+
+      [...d.benar_salah].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+        const stmts = normalizeBsStatements(q.pernyataan);
+        html += `
+          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2.5" id="quiz-card-${q.nomor}">
+            <div class="text-xs font-bold text-emerald-900">Soal No. ${q.nomor} • Benar / Salah</div>
+            ${q.stimulus ? `<p class="text-sm text-slate-700 leading-relaxed">${formatRichText(q.stimulus)}</p>` : ''}
+            ${renderArabicBlockHtml(q.teks_arab, q.sumber_arab)}
+            <p class="text-sm font-semibold text-slate-900">${formatRichText(q.pertanyaan)}</p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs border border-slate-300 bg-white">
+                <thead class="bg-slate-100">
+                  <tr>
+                    <th class="p-2 text-left border border-slate-300">Pernyataan</th>
+                    <th class="p-2 text-center border border-slate-300 w-20">Benar</th>
+                    <th class="p-2 text-center border border-slate-300 w-20">Salah</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${stmts.map((st, sIdx) => `
+                    <tr>
+                      <td class="p-2 border border-slate-300"><strong>${st.huruf}.</strong> ${formatRichText(st.teks)}</td>
+                      <td class="p-2 border border-slate-300 text-center"><input type="radio" name="quiz-bs-${q.nomor}-${sIdx}" value="Benar" /></td>
+                      <td class="p-2 border border-slate-300 text-center"><input type="radio" name="quiz-bs-${q.nomor}-${sIdx}" value="Salah" /></td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+            <div id="quiz-feedback-${q.nomor}" class="hidden text-xs p-2.5 rounded-lg"></div>
+          </div>
+        `;
+      });
+
+      [...d.menjodohkan].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+        const premisList = Array.isArray(q.premis) ? q.premis : [];
+        const responList = Array.isArray(q.respon) ? q.respon : [];
+        html += `
+          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2.5" id="quiz-card-${q.nomor}">
+            <div class="text-xs font-bold text-purple-900">Soal No. ${q.nomor} • Menjodohkan</div>
+            ${q.stimulus ? `<p class="text-sm text-slate-700 leading-relaxed">${formatRichText(q.stimulus)}</p>` : ''}
+            <p class="text-sm font-semibold text-slate-900">${formatRichText(q.pertanyaan)}</p>
+            <div class="space-y-2">
+              ${premisList.map((p, pIdx) => `
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-lg bg-white border border-slate-200 text-xs">
+                  <span><strong>${escapeHtml(p.id || String(pIdx + 1))}.</strong> ${formatRichText(p.teks || '')}</span>
+                  <select id="quiz-mj-${q.nomor}-${escapeHtml(p.id || String(pIdx + 1))}" class="rounded-lg border border-slate-300 px-2.5 py-1.5 font-semibold text-slate-800">
+                    <option value="">-- Pilih Pasangan --</option>
+                    ${responList.map((r, rIdx) => {
+                      const rid = r.id || getAlphabetLabel(rIdx);
+                      return `<option value="${escapeHtml(rid)}">${escapeHtml(rid)}. ${escapeHtml(String(r.teks || '').replace(/<[^>]*>/g, ''))}</option>`;
+                    }).join('')}
+                  </select>
+                </div>
+              `).join('')}
+            </div>
+            <div id="quiz-feedback-${q.nomor}" class="hidden text-xs p-2.5 rounded-lg"></div>
+          </div>
+        `;
+      });
+
+      [...d.esai].sort((a, b) => a.nomor - b.nomor).forEach((q) => {
+        html += `
+          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2.5" id="quiz-card-${q.nomor}">
+            <div class="text-xs font-bold text-amber-900">Soal No. ${q.nomor} • Uraian / Esai (Penilaian Mandiri)</div>
+            ${q.stimulus ? `<p class="text-sm text-slate-700 leading-relaxed">${formatRichText(q.stimulus)}</p>` : ''}
+            <p class="text-sm font-semibold text-slate-900">${formatRichText(q.pertanyaan)}</p>
+            <textarea rows="3" placeholder="Ketik jawaban uraian Anda di sini..." class="w-full rounded-xl border border-slate-300 p-3 text-sm bg-white outline-none focus:border-blue-900"></textarea>
+            <div id="quiz-feedback-${q.nomor}" class="hidden text-xs p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-950">
+              <strong>Kunci Jawaban Ideal:</strong> ${formatRichText(q.kunci_jawaban || '')}
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+        </div>
+        <div class="pt-4 border-t border-slate-200 flex flex-wrap gap-2">
+          <button type="button" onclick="gradeInteractiveQuiz()" class="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow transition cursor-pointer">
+            Periksa Jawaban &amp; Lihat Skor
+          </button>
+          <button type="button" onclick="renderInteractiveQuiz()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition cursor-pointer">
+            Ulangi Kuis
+          </button>
+        </div>
+      `;
+
+      quizContainer.innerHTML = html;
+    }
+
+    function gradeInteractiveQuiz() {
+      if (!currentGeneratedData) return;
+      const d = currentGeneratedData;
+      let earned = 0;
+      let maxObjective = 0;
+
+      d.pg_sederhana.forEach((q) => {
+        maxObjective += 1;
+        const checked = document.querySelector(`input[name="quiz-pg-${q.nomor}"]:checked`);
+        const ans = checked ? checked.value : '';
+        const isCorrect = ans === String(q.kunci).trim().toUpperCase();
+        if (isCorrect) earned += 1;
+        const fb = document.getElementById(`quiz-feedback-${q.nomor}`);
+        if (fb) {
+          fb.classList.remove('hidden');
+          fb.className = `text-xs p-2.5 rounded-lg border ${isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}`;
+          fb.innerHTML = `${isCorrect ? '<strong>Benar!</strong>' : `<strong>Kurang Tepat.</strong> Kunci: <strong>${escapeHtml(q.kunci)}</strong>.`} ${formatRichText(q.pembahasan || '')}`;
+        }
+      });
+
+      d.pg_kompleks.forEach((q) => {
+        maxObjective += 2;
+        const checkedBoxes = Array.from(document.querySelectorAll(`input[name="quiz-pgk-${q.nomor}"]:checked`)).map((el) => el.value).sort();
+        const expected = (Array.isArray(q.kunci) ? q.kunci : [q.kunci]).map((k) => String(k).trim().toUpperCase()).sort();
+        const isCorrect = checkedBoxes.length === expected.length && checkedBoxes.every((v, i) => v === expected[i]);
+        if (isCorrect) earned += 2;
+        const fb = document.getElementById(`quiz-feedback-${q.nomor}`);
+        if (fb) {
+          fb.classList.remove('hidden');
+          fb.className = `text-xs p-2.5 rounded-lg border ${isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}`;
+          fb.innerHTML = `${isCorrect ? '<strong>Benar!</strong>' : `<strong>Kurang Tepat.</strong> Kunci: <strong>${escapeHtml(expected.join(', '))}</strong>.`} ${formatRichText(q.pembahasan || '')}`;
+        }
+      });
+
+      d.benar_salah.forEach((q) => {
+        maxObjective += 2;
+        const stmts = normalizeBsStatements(q.pernyataan);
+        const allMatch = stmts.every((st, sIdx) => {
+          const sel = document.querySelector(`input[name="quiz-bs-${q.nomor}-${sIdx}"]:checked`);
+          return sel && sel.value === st.jawaban;
+        });
+        if (allMatch) earned += 2;
+        const fb = document.getElementById(`quiz-feedback-${q.nomor}`);
+        if (fb) {
+          fb.classList.remove('hidden');
+          fb.className = `text-xs p-2.5 rounded-lg border ${allMatch ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}`;
+          fb.innerHTML = `${allMatch ? '<strong>Semua Pernyataan Benar!</strong>' : `<strong>Belum Tepat Semua.</strong> Kunci: <strong>${escapeHtml(stmts.map((s) => `${s.huruf}:${s.jawaban}`).join(', '))}</strong>.`}`;
+        }
+      });
+
+      d.menjodohkan.forEach((q) => {
+        maxObjective += 3;
+        const premisList = Array.isArray(q.premis) ? q.premis : [];
+        const kp = q.kunci_pasangan || {};
+        const allMatch = premisList.every((p, pIdx) => {
+          const pid = p.id || String(pIdx + 1);
+          const sel = document.getElementById(`quiz-mj-${q.nomor}-${pid}`);
+          return sel && sel.value === String(kp[pid] || '');
+        });
+        if (allMatch) earned += 3;
+        const fb = document.getElementById(`quiz-feedback-${q.nomor}`);
+        if (fb) {
+          fb.classList.remove('hidden');
+          fb.className = `text-xs p-2.5 rounded-lg border ${allMatch ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}`;
+          fb.innerHTML = `${allMatch ? '<strong>Pasangan Tepat Semua!</strong>' : `<strong>Belum Tepat.</strong> Kunci: <strong>${escapeHtml(Object.entries(kp).map(([k, v]) => `${k}→${v}`).join(', '))}</strong>.`}`;
+        }
+      });
+
+      d.esai.forEach((q) => {
+        const fb = document.getElementById(`quiz-feedback-${q.nomor}`);
+        if (fb) fb.classList.remove('hidden');
+      });
+
+      const pct = maxObjective > 0 ? Math.round((earned / maxObjective) * 100) : 100;
+      const banner = document.getElementById('quiz-score-banner');
+      if (banner) {
+        banner.classList.remove('hidden');
+        banner.textContent = `Nilai Objektif: ${pct} / 100 (Skor ${earned}/${maxObjective})`;
+      }
+      showToast(`Pemeriksaan selesai! Nilai objektif Anda: ${pct}/100.`, 'success');
+    }
+
+    /* ==========================================================================
+       6. CETAK PDF, SALIN TEKS, & EKSPOR WORD (.DOC MHTML DENGAN GAMBAR TERSEMAT)
+       ========================================================================== */
+    function printExam() {
+      if (!currentGeneratedData || !currentMeta) {
+        showToast('Silakan buat paket soal terlebih dahulu sebelum mencetak PDF.', 'error');
+        return;
+      }
+
+      if (currentTab === 'kuis') {
+        switchTab('semua');
+      }
+
+      const docEl = document.getElementById('document-container');
+      if (!docEl || docEl.classList.contains('hidden')) {
+        showToast('Lembar naskah belum tersedia untuk dicetak.', 'error');
+        return;
+      }
+
+      const clone = docEl.cloneNode(true);
+      clone.querySelectorAll('.no-print, .hidden').forEach((el) => el.remove());
+
+      const existingPrintFrame = document.getElementById('pdf-print-iframe');
+      if (existingPrintFrame) existingPrintFrame.remove();
+
+      const iframe = document.createElement('iframe');
+      iframe.id = 'pdf-print-iframe';
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      document.body.appendChild(iframe);
+
+      const safeTitle = `${editableJudulAsesmen}_${currentMeta.mapel}_Kelas_${currentMeta.kelas}`.replace(/[^a-zA-Z0-9_-]+/g, '_');
+      const printHtml = `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>${escapeHtml(safeTitle)}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 15mm 18mm 15mm 18mm;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+      color: #0f172a;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 11pt;
+      line-height: 1.5;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .arabic-text {
+      font-family: "Amiri", "Traditional Arabic", serif;
+      direction: rtl;
+      unicode-bidi: isolate;
+      font-size: 1.45rem;
+      line-height: 2.35;
+      text-align: right;
+    }
+    .kop-header-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      border-bottom: 3px double #0f172a;
+      margin-bottom: 10px;
+    }
+    .kop-header-table td {
+      vertical-align: middle;
+      padding-bottom: 8px;
+    }
+    .identitas-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 11pt;
+      margin-bottom: 12px;
+      border-bottom: 1.5px solid #0f172a;
+    }
+    .identitas-table td {
+      padding: 2.5px 2px;
+      vertical-align: top;
+    }
+    .soal-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin-bottom: 10px;
+    }
+    .soal-table td {
+      vertical-align: top;
+      padding: 1.5px 0;
+    }
+    .opsi-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin-top: 3px;
+    }
+    .opsi-table td {
+      vertical-align: top;
+      padding: 1.5px 0;
+    }
+    .akm-grid-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin-top: 6px;
+      font-size: 10.5pt;
+    }
+    .akm-grid-table th,
+    .akm-grid-table td {
+      border: 1px solid #334155;
+      padding: 5px 7px;
+      vertical-align: top;
+    }
+    .akm-grid-table th {
+      background-color: #f1f5f9;
+      font-weight: bold;
+      text-align: center;
+    }
+    .pernyataan-inner-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+    .pernyataan-inner-table td {
+      border: none !important;
+      padding: 0 !important;
+      vertical-align: top;
+    }
+    .page-break-before {
+      page-break-before: always;
+      break-before: page;
+    }
+    .soal-block {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    img {
+      max-width: 100%;
+      page-break-inside: avoid;
+    }
+  </style>
+</head>
+<body>
+  ${clone.innerHTML}
+</body>
+</html>`;
+
+      const frameWin = iframe.contentWindow;
+      const frameDoc = frameWin?.document;
+      if (!frameDoc) {
+        window.print();
+        return;
+      }
+
+      showToast('Menyiapkan lembar cetak A4 — pilih "Save as PDF" pada dialog cetak.', 'info');
+      frameDoc.open();
+      frameDoc.write(printHtml);
+      frameDoc.close();
+
+      let printed = false;
+      const triggerFramePrint = () => {
+        if (printed) return;
+        printed = true;
+        try {
+          frameWin.focus();
+          frameWin.print();
+        } catch (err) {
+          window.print();
+        }
+        setTimeout(() => {
+          if (iframe.parentNode) iframe.remove();
+        }, 2000);
+      };
+
+      iframe.onload = () => setTimeout(triggerFramePrint, 350);
+      setTimeout(triggerFramePrint, 900);
+    }
+
+    function copyPlainText() {
+      const docEl = document.getElementById('document-container');
+      if (!docEl || docEl.classList.contains('hidden')) return;
+      if (copyTextToClipboard(docEl.innerText)) {
+        showToast('Seluruh teks naskah soal dan kunci berhasil disalin.', 'success');
+      } else {
+        showToast('Gagal menyalin teks.', 'error');
+      }
+    }
+
+    async function convertImageToPngData(src) {
+      return await new Promise((resolve) => {
+        if (!src) {
+          resolve(null);
+          return;
+        }
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          try {
+            const natW = img.naturalWidth || 120;
+            const natH = img.naturalHeight || 120;
+            const maxDim = 420;
+            const scale = Math.min(1, maxDim / Math.max(natW, natH));
+            const w = Math.max(24, Math.round(natW * scale));
+            const h = Math.max(24, Math.round(natH * scale));
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const pngDataUrl = canvas.toDataURL('image/png');
+            const base64 = pngDataUrl.split(',')[1] || '';
+            resolve({ base64, width: w, height: h });
+          } catch (e) {
+            if (src.startsWith('data:image/')) {
+              const base64 = src.split(',')[1] || '';
+              resolve({ base64, width: 140, height: 140 });
+            } else {
+              resolve(null);
+            }
+          }
+        };
+        img.onerror = () => {
+          if (src.startsWith('data:image/')) {
+            const base64 = src.split(',')[1] || '';
+            resolve({ base64, width: 140, height: 140 });
+          } else {
+            resolve(null);
+          }
+        };
+        img.src = src;
+      });
+    }
+
+    async function buildMhtmlWordDocument(docTitle, rawSectionHtml) {
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = rawSectionHtml;
+
+      wrapper.querySelectorAll('.no-print').forEach((el) => el.remove());
+      wrapper.querySelectorAll('table').forEach((table) => {
+        table.setAttribute('width', '100%');
+        table.setAttribute('border', table.classList.contains('akm-grid-table') ? '1' : '0');
+        table.setAttribute('cellspacing', '0');
+        table.setAttribute('cellpadding', '0');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.tableLayout = 'fixed';
+        table.style.msoTableLspace = '0pt';
+        table.style.msoTableRspace = '0pt';
+      });
+      wrapper.querySelectorAll('colgroup col').forEach((col) => {
+        const cssWidth = (col.style.width || '').trim();
+        if (cssWidth) {
+          col.setAttribute('width', cssWidth);
+          col.style.width = cssWidth;
+        }
+      });
+      wrapper.querySelectorAll('.soal-table > tbody > tr > td:first-child, .soal-table > tr > td:first-child').forEach((td) => {
+        td.style.width = '0.75cm';
+        td.style.whiteSpace = 'nowrap';
+      });
+
+      const imgNodes = Array.from(wrapper.querySelectorAll('img'));
+      const mhtmlParts = [];
+
+      for (let i = 0; i < imgNodes.length; i++) {
+        const imgEl = imgNodes[i];
+        const src = imgEl.getAttribute('src') || '';
+        const converted = await convertImageToPngData(src);
+        if (converted && converted.base64) {
+          const cidName = `img_smp3_${i + 1}.png`;
+          const isLogo = /logo/i.test(imgEl.getAttribute('alt') || '');
+          const targetW = isLogo ? 62 : Math.min(260, converted.width);
+          const targetH = isLogo ? 62 : Math.round((targetW / converted.width) * converted.height);
+          imgEl.setAttribute('src', `file:///C:/word_assets/${cidName}`);
+          imgEl.setAttribute('width', String(targetW));
+          imgEl.setAttribute('height', String(targetH));
+          mhtmlParts.push({
+            location: `file:///C:/word_assets/${cidName}`,
+            base64: converted.base64
+          });
+        } else {
+          imgEl.remove();
+        }
+      }
+
+      const fullHtml = `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8" />
+<title>${escapeHtml(docTitle)}</title>
+<style>
+  @page Section1 {
+    size: 21.0cm 29.7cm;
+    margin: 1.8cm 1.8cm 1.8cm 1.8cm;
+  }
+  div.Section1 { page: Section1; }
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 11pt;
+    line-height: 1.45;
+    color: #000000;
+  }
+  .arabic-text {
+    font-family: "Traditional Arabic", "Amiri", serif;
+    direction: rtl;
+    font-size: 16pt;
+    line-height: 2.1;
+    text-align: right;
+  }
+  .kop-header-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    border-bottom: 3px double #000000;
+    margin-bottom: 10px;
+  }
+  .kop-header-table td {
+    vertical-align: middle;
+    padding-bottom: 6px;
+  }
+  .identitas-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 11pt;
+    margin-bottom: 10px;
+    border-bottom: 1.5px solid #000000;
+  }
+  .identitas-table td {
+    padding: 2px;
+    vertical-align: top;
+  }
+  table {
+    mso-table-lspace: 0pt !important;
+    mso-table-rspace: 0pt !important;
+    border-collapse: collapse;
+  }
+  .soal-table, .opsi-table, .pernyataan-inner-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+    mso-table-layout-alt: fixed;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  .soal-table { margin-bottom: 7pt; }
+  .soal-table td, .opsi-table td, .pernyataan-inner-table td {
+    vertical-align: top;
+    padding: 1.5pt 0;
+    mso-line-height-rule: at-least;
+  }
+  .soal-table tr, .opsi-table tr { page-break-inside: avoid; }
+  .soal-block { page-break-inside: avoid; break-inside: avoid; }
+  .soal-table > colgroup > col:first-child { width: 0.75cm !important; }
+  .opsi-table > colgroup > col:first-child { width: 0.65cm !important; }
+  .arabic-text { mso-bidi-font-family: "Traditional Arabic"; }
+  p, div { widows: 2; orphans: 2; }
+  .akm-grid-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin-top: 5px;
+    font-size: 10.5pt;
+  }
+  .akm-grid-table th, .akm-grid-table td {
+    border: 1px solid #000000;
+    padding: 4px 6px;
+    vertical-align: top;
+  }
+  .akm-grid-table th {
+    background-color: #f1f5f9;
+    font-weight: bold;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="Section1">
+${wrapper.innerHTML}
+<div style="margin-top: 14pt; padding-top: 6pt; border-top: 1px solid #cbd5e1; font-size: 8.5pt; color: #475569; text-align: right;">
+  Sumber Referensi Penyusunan (Gemini): <a href="${GEMINI_SHARE_REFERENCE_URL}" target="_blank" style="color: #1e3a8a; text-decoration: underline;">${GEMINI_SHARE_REFERENCE_URL}</a>
+</div>
+</div>
+</body>
+</html>`;
+
+      const boundary = '----=_NextPart_SMPN3_BESUKI_WORD_001';
+      let mhtml = `MIME-Version: 1.0\r\nContent-Type: multipart/related; boundary="${boundary}"\r\n\r\n`;
+      mhtml += `--${boundary}\r\nContent-Type: text/html; charset="utf-8"\r\nContent-Transfer-Encoding: 8bit\r\n\r\n${fullHtml}\r\n\r\n`;
+
+      mhtmlParts.forEach((part) => {
+        const chunked = part.base64.match(/.{1,76}/g)?.join('\r\n') || part.base64;
+        mhtml += `--${boundary}\r\nContent-Type: image/png\r\nContent-Transfer-Encoding: base64\r\nContent-Location: ${part.location}\r\n\r\n${chunked}\r\n\r\n`;
+      });
+
+      mhtml += `--${boundary}--`;
+      return mhtml;
+    }
+
+    async function downloadWordPart(part) {
+      if (!currentGeneratedData || !currentMeta) {
+        showToast('Silakan buat paket soal terlebih dahulu.', 'error');
+        return;
+      }
+
+      const sectionMap = {
+        soal: { id: 'doc-section-naskah', label: 'Naskah_Soal' },
+        kunci: { id: 'doc-section-kunci', label: 'Kunci_Jawaban' },
+        kisikisi: { id: 'doc-section-kisikisi', label: 'Kisi_Kisi_dan_Kartu_Soal' }
+      };
+
+      const target = sectionMap[part];
+      const el = target ? document.getElementById(target.id) : null;
+      if (!el) return;
+
+      showToast(`Menyiapkan dokumen Word (${target.label})...`, 'info');
+      const mhtmlContent = await buildMhtmlWordDocument(target.label, el.innerHTML);
+      const blob = new Blob([mhtmlContent], { type: 'application/msword;charset=utf-8' });
+      const safeMapel = currentMeta.mapel.replace(/[^a-zA-Z0-9]+/g, '_');
+      const filename = `${target.label}_${safeMapel}_Kelas_${currentMeta.kelas}_SMPN3_Besuki.doc`;
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`File ${filename} berhasil diunduh.`, 'success');
+    }
+
+    function copyTextToClipboard(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      let success = false;
+      try {
+        success = document.execCommand('copy');
+      } catch (e) {}
+      document.body.removeChild(ta);
+      return success;
+    }
+
+    /* ==========================================================================
+       7. INISIALISASI EVENT LISTENER SAAT HALAMAN SIAP
+       ========================================================================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('soal-form');
+      const mapelSelect = document.getElementById('mapel-select');
+      const mapelCustom = document.getElementById('mapel-custom');
+      const btnResetForm = document.getElementById('btn-reset-form');
+
+      if (form) {
+        form.addEventListener('submit', handleGenerateSoal);
+      }
+
+      if (mapelSelect && mapelCustom) {
+        mapelSelect.addEventListener('change', () => {
+          if (mapelSelect.value === '__CUSTOM__') {
+            mapelCustom.classList.remove('hidden');
+            mapelCustom.focus();
+          } else {
+            mapelCustom.classList.add('hidden');
+          }
+        });
+      }
+
+      if (btnResetForm) {
+        btnResetForm.addEventListener('click', resetAllWorkspace);
+      }
+
+      ['jml-pg-sederhana', 'jml-pg-kompleks', 'jml-benar-salah', 'jml-menjodohkan', 'jml-esai'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateTotalBadge);
+      });
+
+      document.getElementById('input-logo-pemkab')?.addEventListener('change', (e) => {
+        handleLogoFileUpload('pemkab', e.target.files?.[0]);
+      });
+      document.getElementById('url-logo-pemkab')?.addEventListener('change', (e) => {
+        saveLogoToStorage('pemkab', e.target.value.trim());
+      });
+      document.getElementById('btn-clear-logo-pemkab')?.addEventListener('click', () => {
+        const urlEl = document.getElementById('url-logo-pemkab');
+        if (urlEl) urlEl.value = '';
+        saveLogoToStorage('pemkab', '');
+      });
+
+      document.getElementById('input-logo-sekolah')?.addEventListener('change', (e) => {
+        handleLogoFileUpload('sekolah', e.target.files?.[0]);
+      });
+      document.getElementById('url-logo-sekolah')?.addEventListener('change', (e) => {
+        saveLogoToStorage('sekolah', e.target.value.trim());
+      });
+      document.getElementById('btn-clear-logo-sekolah')?.addEventListener('click', () => {
+        const urlEl = document.getElementById('url-logo-sekolah');
+        if (urlEl) urlEl.value = '';
+        saveLogoToStorage('sekolah', '');
+      });
+
+      updateTotalBadge();
+      loadSavedLogos();
+    });
+  </script>
+
+</body></html>
