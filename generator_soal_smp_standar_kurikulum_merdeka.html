@@ -3,7 +3,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generator Soal SMP — Standar Kurikulum Merdeka</title>
+  <link rel="related" href="https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P">
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Pustaka html2canvas 1.4.1 & jsPDF 2.5.1 untuk paginasi dan ekspor PDF A4 presisi -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" referrerpolicy="no-referrer"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -29,12 +33,164 @@
       line-height: 1.5;
     }
 
+    .exam-paper ol {
+      list-style-type: decimal;
+    }
+
+    .exam-paper ul {
+      list-style-type: disc;
+    }
+
     .exam-paper .ui-badge,
     .exam-paper .no-print {
       font-family: 'Inter', sans-serif;
     }
 
-    /* Tabel kop & identitas presisi (layar & Word) */
+    /* Styling khusus lembaran halaman A4 saat ekspor PDF */
+    .pdf-page-sheet {
+      width: 700px;
+      background-color: #ffffff;
+      color: #0f172a;
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 11pt;
+      line-height: 1.45;
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .pdf-page-sheet * {
+      box-sizing: border-box;
+    }
+
+    .pdf-page-sheet ol {
+      list-style-type: decimal;
+      list-style-position: outside;
+      margin: 4px 0 0 20px;
+      padding: 0;
+    }
+
+    .pdf-page-sheet ul {
+      list-style-type: disc;
+      list-style-position: outside;
+      margin: 4px 0 0 18px;
+      padding: 0;
+    }
+
+    .pdf-page-sheet .kop-header-table {
+      width: 700px;
+      border-collapse: collapse;
+      table-layout: fixed;
+      border-bottom: 2.5px solid #0f172a;
+      margin-bottom: 2px;
+    }
+
+    .pdf-page-sheet .kop-double-rule {
+      width: 700px;
+      border-top: 1px solid #0f172a;
+      margin-bottom: 10px;
+    }
+
+    .pdf-page-sheet .identitas-table {
+      width: 700px;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 10.5pt;
+      margin-bottom: 12px;
+      border-bottom: 1.5px solid #0f172a;
+    }
+
+    .pdf-page-sheet .identitas-table td {
+      padding: 2.5px 2px;
+      vertical-align: top;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
+    .pdf-page-sheet .soal-table,
+    .pdf-page-sheet .opsi-table,
+    .pdf-page-sheet .pernyataan-inner-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .pdf-page-sheet .soal-table {
+      width: 700px;
+      margin-bottom: 9px;
+    }
+
+    .pdf-page-sheet .soal-table > tbody > tr > td,
+    .pdf-page-sheet .soal-table > tr > td,
+    .pdf-page-sheet .opsi-table > tbody > tr > td,
+    .pdf-page-sheet .opsi-table > tr > td,
+    .pdf-page-sheet .pernyataan-inner-table > tbody > tr > td,
+    .pdf-page-sheet .pernyataan-inner-table > tr > td {
+      vertical-align: top;
+      padding: 1.5px 0;
+      line-height: 1.45;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      text-align: left !important;
+    }
+
+    .pdf-page-sheet .soal-table td > div:first-child {
+      margin-top: 0 !important;
+    }
+
+    .pdf-page-sheet .akm-grid-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin-top: 6px;
+      margin-bottom: 8px;
+      font-size: 10pt;
+    }
+
+    .pdf-page-sheet .akm-grid-table th,
+    .pdf-page-sheet .akm-grid-table td {
+      border: 1px solid #334155;
+      padding: 5px 7px;
+      vertical-align: top;
+      line-height: 1.4;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
+    .pdf-page-sheet .akm-grid-table th {
+      background-color: #f1f5f9;
+      font-weight: bold;
+      text-align: center;
+      vertical-align: middle !important;
+      line-height: 1.15 !important;
+      padding: 3px 7px 8px 7px !important;
+    }
+
+    /* Kotak centang presisi untuk PDF (PG Kompleks & Benar/Salah) */
+    .pdf-checkbox {
+      display: block;
+      width: 10.5px;
+      height: 10.5px;
+      border: 1.4px solid #0f172a;
+      border-radius: 1px;
+      background-color: #ffffff;
+      margin: 7px 0 0 0;
+      box-sizing: border-box;
+    }
+
+    .pdf-page-sheet .akm-grid-table td.pdf-checkbox-cell {
+      text-align: center !important;
+      vertical-align: middle !important;
+      padding: 4px 2px !important;
+    }
+
+    .pdf-page-sheet .akm-grid-table td.pdf-checkbox-cell .pdf-checkbox {
+      display: block;
+      margin: 0 auto !important;
+    }
+
+    /* Tabel kop & identitas presisi (layar, PDF, & Word) */
     .kop-header-table {
       width: 100%;
       border-collapse: collapse;
@@ -107,6 +263,7 @@
       background-color: #f1f5f9;
       font-weight: bold;
       text-align: center;
+      vertical-align: middle;
     }
 
     .pernyataan-inner-table {
@@ -136,7 +293,7 @@
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      .no-print {
+      .no-print, .hidden {
         display: none !important;
       }
       main, .grid {
@@ -164,6 +321,9 @@
       .page-break-before {
         page-break-before: always;
         break-before: page;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        border-top: none !important;
       }
       .soal-block {
         page-break-inside: avoid;
@@ -191,18 +351,18 @@
         </div>
       </div>
 
-      <!-- Status Mesin Pembuat Soal -->
+      <!-- Status Mesin Pembuat Soal & Tautan Gemini Share -->
       <div class="flex flex-wrap items-center gap-2 self-start sm:self-center">
-        <a href="https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P" target="_blank" rel="noopener noreferrer" title="Buka Tautan Referensi Gemini" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition">
-          <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-900/70 text-emerald-300 border border-emerald-400/30">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>API Key Terhubung</span>
+        </span>
+        <a id="header-gemini-link" href="https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P" target="_blank" rel="noopener noreferrer" title="Buka Tautan Gemini AI Share" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-400/30 shadow-sm transition">
+          <span id="header-ai-status-text">Gemini AI • Buka Share</span>
+          <svg class="w-3.5 h-3.5 text-emerald-300/90" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"></path>
           </svg>
-          <span>Tautan Gemini</span>
         </a>
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 shadow-sm">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span id="header-ai-status-text">Gemini AI • Generate Otomatis</span>
-        </div>
       </div>
     </div>
   </header>
@@ -475,23 +635,32 @@
           <div class="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200 space-y-3">
             <div class="flex items-center justify-between gap-2">
               <span class="block text-xs font-bold text-blue-950">7. Penyusun Soal Otomatis (Gemini AI)</span>
-              <span id="gemini-sync-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900">Siap Menyusun</span>
+              <span id="gemini-sync-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900">API Terhubung Otomatis</span>
             </div>
 
             <p class="text-[11px] text-slate-600 leading-relaxed">
-              Isi parameter di atas (dan tambahkan fokus/catatan khusus di bawah bila perlu). <strong>Gemini AI</strong> akan memproses instruksi tersebut menjadi naskah soal yang akurat sesuai mata pelajaran, stimulus kontekstual, kunci jawaban, pembahasan, kisi-kisi, dan kartu soal.
+              Koneksi <strong>Gemini AI</strong> telah tertanam otomatis (tanpa perlu input API Key). Isi parameter di atas lalu klik tombol di bawah untuk menyusun naskah soal, stimulus kontekstual, kunci jawaban, pembahasan, kisi-kisi, dan kartu soal.
             </p>
 
-            <div class="flex items-center justify-between gap-2 px-2.5 py-2 rounded-lg bg-white border border-blue-200/80 text-[11px]">
-              <a href="https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-900 hover:underline truncate flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"></path>
-                </svg>
-                <span>Buka Referensi Gemini Share</span>
+            <!-- Tautan Rujukan Gemini Share -->
+            <div class="rounded-lg bg-white border border-blue-200/90 p-2.5 space-y-1.5">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-900">Tautan Gemini AI Share:</span>
+                <div class="flex items-center gap-1">
+                  <button type="button" id="btn-copy-gemini-url" onclick="copyGeminiShareUrl()" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-semibold transition cursor-pointer">
+                    Salin URL
+                  </button>
+                  <a id="gemini-share-anchor" href="https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-950 hover:bg-blue-900 text-white text-[10px] font-semibold transition">
+                    <span>Buka</span>
+                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"></path>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+              <a href="https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P" target="_blank" rel="noopener noreferrer" class="block text-[11px] font-medium text-blue-700 hover:text-blue-900 underline break-all">
+                https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P
               </a>
-              <button type="button" onclick="copyGeminiReferenceLink()" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold shrink-0 cursor-pointer">
-                Salin Link
-              </button>
             </div>
 
             <div>
@@ -523,8 +692,19 @@
           </div>
           <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
             <div class="flex flex-wrap items-center gap-1.5">
+              <!-- Tombol Unduh PDF langsung (.pdf) -->
+              <button type="button" id="btn-download-pdf" onclick="downloadPdf()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-700 hover:bg-rose-800 text-white transition cursor-pointer disabled:opacity-60">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <span id="btn-download-pdf-label">Unduh PDF (.pdf)</span>
+              </button>
+              <!-- Tombol Cetak Langsung via Dialog Printer -->
               <button type="button" onclick="printExam()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-900 text-white transition cursor-pointer">
-                Cetak / PDF
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"></path>
+                </svg>
+                Cetak
               </button>
               <button type="button" onclick="downloadWordPart('soal')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-700 hover:bg-blue-800 text-white transition cursor-pointer">
                 Soal (.doc)
@@ -566,7 +746,7 @@
               </tr>
             </tbody></table>
             <div style="text-align: center; font-size: 10pt; color: #475569; padding-top: 4px;">
-              Lengkapi parameter di panel kiri lalu klik <strong>Buat Paket Soal Sekarang</strong> untuk menyusun naskah ujian lengkap di bawah kop surat ini, atau buka referensi langsung di <a href="https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; font-weight: 600; text-decoration: underline;">Gemini Share</a>.
+              Lengkapi parameter di panel kiri lalu klik <strong>Buat Paket Soal Sekarang</strong> untuk menyusun naskah ujian lengkap di bawah kop surat ini.
             </div>
           </div>
         </div>
@@ -586,7 +766,7 @@
         <!-- STATE 3: DOKUMEN NASKAH SOAL, KUNCI, KISI-KISI & ANALISIS -->
         <div id="document-container" class="exam-paper hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-10 print-full-width"></div>
 
-        <!-- STATE 3: MODE KUIS INTERAKTIF -->
+        <!-- STATE 4: MODE KUIS INTERAKTIF -->
         <div id="quiz-container" class="no-print hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 space-y-6"></div>
 
       </section>
@@ -595,16 +775,16 @@
 
   <footer class="no-print border-t border-slate-200 bg-white py-3.5 px-6 text-center text-xs text-slate-500">
     Generator Soal SMP — Standar Kurikulum Merdeka (Fase D) • SMP Negeri 3 Besuki •
-    <a href="https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P" target="_blank" rel="noopener noreferrer" class="text-blue-900 font-semibold hover:underline">Referensi Gemini</a>
+    <a href="https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P" target="_blank" rel="noopener noreferrer" class="text-blue-800 hover:text-blue-950 underline font-medium">Gemini AI Share</a>
   </footer>
 
   <!-- SCRIPT UTAMA APLIKASI -->
   <script>
     const STORAGE_LOGO_PEMKAB = 'smp_soal_logo_pemkab_v1';
     const STORAGE_LOGO_SEKOLAH = 'smp_soal_logo_sekolah_v1';
-    const GEMINI_MODEL = 'gemini-3-flash-preview';
-    const GEMINI_SHARE_REFERENCE_URL = 'https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P';
-    const DEFAULT_GEMINI_API_KEY = 'AQ.Ab8RN6JzsB9YBfmpflCQDhXATRYRKYLHN-5kP6Eseo8LCgl6Jg';
+    const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-3-flash-preview'];
+    const GEMINI_API_KEY = 'AQ.Ab8RN6I2LYMdVK_bf2xeETvvRstIVlYaCOXeMJVKaeDfpRy6_A';
+    const GEMINI_SHARE_URL = 'https://gemini.google.com/share/d/11SVDYdUKUh7OI6rwt87IPeHu76cJkr3P';
 
     let currentGeneratedData = null;
     let currentMeta = null;
@@ -665,11 +845,11 @@
       }, 4500);
     }
 
-    function copyGeminiReferenceLink() {
-      if (copyTextToClipboard(GEMINI_SHARE_REFERENCE_URL)) {
-        showToast('Tautan Gemini berhasil disalin ke clipboard.', 'success');
+    function copyGeminiShareUrl() {
+      if (copyTextToClipboard(GEMINI_SHARE_URL)) {
+        showToast('Tautan Gemini AI Share berhasil disalin ke clipboard.', 'success');
       } else {
-        showToast('Gagal menyalin tautan Gemini.', 'error');
+        showToast('Gagal menyalin tautan Gemini AI Share.', 'error');
       }
     }
 
@@ -705,39 +885,8 @@
     }
 
     /* ==========================================================================
-       2. UTILITAS TIMER, WIKIPEDIA & GAMBAR RIIL
+       2. PENCARIAN KONTEKS & GAMBAR TOPIK RIIL
        ========================================================================== */
-    function startLoadingTimer() {
-      stopLoadingTimer();
-      const startTime = Date.now();
-      const badge = document.getElementById('loading-timer-badge');
-      if (badge) badge.textContent = 'Waktu proses: 0 detik';
-      loadingTimerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        if (badge) badge.textContent = `Waktu proses: ${elapsed} detik`;
-      }, 1000);
-    }
-
-    function stopLoadingTimer() {
-      if (loadingTimerInterval) {
-        clearInterval(loadingTimerInterval);
-        loadingTimerInterval = null;
-      }
-    }
-
-    function updateGeminiSyncBadge(label, tone = 'emerald') {
-      const badge = document.getElementById('gemini-sync-badge');
-      if (!badge) return;
-      badge.textContent = label;
-      if (tone === 'amber') {
-        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900';
-      } else if (tone === 'rose') {
-        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-900';
-      } else {
-        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900';
-      }
-    }
-
     async function fetchWikipediaSummaryContext(topic, mapel) {
       const queries = [topic, `${topic} ${mapel}`];
       const facts = [];
@@ -944,6 +1093,9 @@
       return cycle[index % cycle.length];
     }
 
+    /* ==========================================================================
+       3. BANK SOAL CADANGAN KONTEKSTUAL (FALLBACK)
+       ========================================================================== */
     function buildSubjectQuestionBank(meta, wikiFacts = []) {
       const m = meta.mapel;
       const t = meta.materi;
@@ -1412,7 +1564,6 @@
       const kelasSelect = document.getElementById('kelas-select');
       const materiInput = document.getElementById('materi-input');
       const kesulitanSelect = document.getElementById('kesulitan-select');
-      const instruksiInput = document.getElementById('custom-prompt-instruction');
 
       const mapelVal = mapelSelect?.value === '__CUSTOM__'
         ? (mapelCustom?.value || '').trim()
@@ -1420,7 +1571,6 @@
       const kelasVal = (kelasSelect?.value || '').trim();
       const materiVal = (materiInput?.value || '').trim();
       const kesulitanVal = (kesulitanSelect?.value || '').trim();
-      const instruksiTambahan = (instruksiInput?.value || '').trim();
 
       const jmlPgSederhana = Math.max(0, parseInt(document.getElementById('jml-pg-sederhana')?.value || '0', 10) || 0);
       const jmlPgKompleks = Math.max(0, parseInt(document.getElementById('jml-pg-kompleks')?.value || '0', 10) || 0);
@@ -1438,6 +1588,7 @@
       const gambarBenarSalah = Math.max(0, parseInt(document.getElementById('gambar-benar-salah')?.value || '0', 10) || 0);
       const gambarMenjodohkan = Math.max(0, parseInt(document.getElementById('gambar-menjodohkan')?.value || '0', 10) || 0);
       const gambarEsai = Math.max(0, parseInt(document.getElementById('gambar-esai')?.value || '0', 10) || 0);
+      const instruksiTambahan = (document.getElementById('custom-prompt-instruction')?.value || '').trim();
 
       const errors = [];
       if (!mapelVal) errors.push('Mata Pelajaran wajib dipilih atau diisi.');
@@ -1464,7 +1615,6 @@
         kelas: kelasVal,
         materi: materiVal,
         kesulitan: kesulitanVal,
-        instruksiTambahan,
         jmlPgSederhana,
         jmlPgKompleks,
         jmlBenarSalah,
@@ -1478,7 +1628,8 @@
         gambarPgKompleks,
         gambarBenarSalah,
         gambarMenjodohkan,
-        gambarEsai
+        gambarEsai,
+        instruksiTambahan
       };
     }
 
@@ -1716,23 +1867,23 @@
       const isBahasInggris = /bahasa inggris/i.test(meta.mapel);
       const bagianList = [];
       if (meta.jmlPgSederhana > 0) {
-        const imgNote = meta.gambarPgSederhana > 0 ? ` (sertakan deskripsi ilustrasi gambar pada ${meta.gambarPgSederhana} soal pertama)` : '';
+        const imgNote = meta.gambarPgSederhana > 0 ? ` (sertakan deskripsi/keterangan ilustrasi gambar pada ${meta.gambarPgSederhana} soal pertama)` : '';
         bagianList.push(`- BAGIAN A (Pilihan Ganda Sederhana): ${meta.jmlPgSederhana} butir soal dengan 4 opsi jawaban (A, B, C, D) dan 1 jawaban benar${imgNote}.`);
       }
       if (meta.jmlPgKompleks > 0) {
-        const imgNote = meta.gambarPgKompleks > 0 ? ` (sertakan deskripsi ilustrasi gambar pada ${meta.gambarPgKompleks} soal pertama)` : '';
+        const imgNote = meta.gambarPgKompleks > 0 ? ` (sertakan deskripsi/keterangan ilustrasi gambar pada ${meta.gambarPgKompleks} soal pertama)` : '';
         bagianList.push(`- BAGIAN B (Pilihan Ganda Kompleks): ${meta.jmlPgKompleks} butir soal dengan masing-masing ${meta.pernyataanPgk} opsi pernyataan (A–${getAlphabetLabel(meta.pernyataanPgk - 1)}) dan lebih dari 1 jawaban benar${imgNote}.`);
       }
       if (meta.jmlBenarSalah > 0) {
-        const imgNote = meta.gambarBenarSalah > 0 ? ` (sertakan deskripsi ilustrasi gambar pada ${meta.gambarBenarSalah} soal pertama)` : '';
-        bagianList.push(`- BAGIAN C (Benar / Salah): ${meta.jmlBenarSalah} butir soal dengan masing-masing ${meta.pernyataanBs} pernyataan berabjad (A–${getAlphabetLabel(meta.pernyataanBs - 1)}) beserta keterangan Benar atau Salah${imgNote}.`);
+        const imgNote = meta.gambarBenarSalah > 0 ? ` (sertakan deskripsi/keterangan ilustrasi gambar pada ${meta.gambarBenarSalah} soal pertama)` : '';
+        bagianList.push(`- BAGIAN C (Benar / Salah): ${meta.jmlBenarSalah} butir soal dengan masing-masing ${meta.pernyataanBs} pernyataan berabjad (A–${getAlphabetLabel(meta.pernyataanBs - 1)}) beserta keterangan [Benar] atau [Salah]${imgNote}.`);
       }
       if (meta.jmlMenjodohkan > 0) {
-        const imgNote = meta.gambarMenjodohkan > 0 ? ` (sertakan deskripsi ilustrasi gambar pada ${meta.gambarMenjodohkan} soal pertama)` : '';
+        const imgNote = meta.gambarMenjodohkan > 0 ? ` (sertakan deskripsi/keterangan ilustrasi gambar pada ${meta.gambarMenjodohkan} soal pertama)` : '';
         bagianList.push(`- BAGIAN D (Menjodohkan): ${meta.jmlMenjodohkan} butir soal dengan ${meta.premisMenjodohkan} premis (1–${meta.premisMenjodohkan}) dan ${meta.premisMenjodohkan + 1} pilihan respon (A–${getAlphabetLabel(meta.premisMenjodohkan)})${imgNote}.`);
       }
       if (meta.jmlEsai > 0) {
-        const imgNote = meta.gambarEsai > 0 ? ` (sertakan deskripsi ilustrasi gambar pada ${meta.gambarEsai} soal pertama)` : '';
+        const imgNote = meta.gambarEsai > 0 ? ` (sertakan deskripsi/keterangan ilustrasi gambar pada ${meta.gambarEsai} soal pertama)` : '';
         bagianList.push(`- BAGIAN E (Uraian / Esai): ${meta.jmlEsai} butir soal analitis lengkap dengan kunci jawaban ideal dan rubrik penskoran${imgNote}.`);
       }
 
@@ -1742,7 +1893,6 @@
         : '';
 
       return `Buatkan paket naskah soal SMP Kurikulum Merdeka (Fase D) yang bermutu tinggi, kontekstual, akurat secara keilmuan sesuai mata pelajaran ${meta.mapel}, dan tidak mengulang kalimat dengan spesifikasi berikut:
-- Referensi Tautan Sumber Gemini: ${GEMINI_SHARE_REFERENCE_URL}
 - Mata Pelajaran: ${meta.mapel}
 - Kelas / Fase: Kelas ${meta.kelas} SMP (Fase D)
 - Materi Pokok / Topik: ${meta.materi}
@@ -1758,16 +1908,75 @@ ATURAN PROSEDUR PENYUSUNAN SOAL:
 3. Sertakan kunci jawaban yang terverifikasi benar, pembahasan logis, indikator soal, dan rubrik penskoran yang lengkap untuk setiap butir soal.`;
     }
 
-    async function fetchQuestionsFromGeminiApi(meta, prompt) {
-      const apiKey = (document.getElementById('gemini-api-key')?.value || DEFAULT_GEMINI_API_KEY).trim();
-      if (!apiKey) {
-        throw new Error('Gemini API Key belum tersedia.');
+    function updateGeminiSyncBadge(label, tone = 'emerald') {
+      const badge = document.getElementById('gemini-sync-badge');
+      if (!badge) return;
+      badge.textContent = label;
+      if (tone === 'amber') {
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 animate-pulse';
+      } else {
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900';
+      }
+    }
+
+    /* ==========================================================================
+       4. INTEGRASI GEMINI AI
+       ========================================================================== */
+    async function callGeminiWithRetry(payload, maxRetries = 2) {
+      const apiKey = GEMINI_API_KEY;
+      let lastError = null;
+
+      for (const modelName of GEMINI_MODELS) {
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`;
+        let delay = 1000;
+
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 35000);
+          try {
+            const response = await fetch(apiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+              if ((response.status === 429 || response.status >= 500) && attempt < maxRetries) {
+                await new Promise((res) => setTimeout(res, delay));
+                delay *= 2;
+                continue;
+              }
+              const err = new Error(`HTTP ${response.status}`);
+              err.nonRetryable = response.status === 400 || response.status === 401 || response.status === 403 || response.status === 404;
+              throw err;
+            }
+
+            const result = await response.json();
+            const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!text) throw new Error('Respons AI kosong.');
+            return JSON.parse(text);
+          } catch (err) {
+            clearTimeout(timeoutId);
+            lastError = err;
+            if (err.nonRetryable || attempt === maxRetries) break;
+            await new Promise((res) => setTimeout(res, delay));
+            delay *= 2;
+          }
+        }
       }
 
+      throw lastError || new Error('Gagal terhubung ke layanan Gemini AI.');
+    }
+
+    async function generateQuestionsWithGemini(meta) {
       const isPai = /agama islam|pai/i.test(meta.mapel);
       const isBahasInggris = /bahasa inggris/i.test(meta.mapel);
+      const prompt = buildStructuredPromptFromMeta(meta);
+
       const systemInstruction = `Anda adalah pakar penyusun naskah asesmen SMP Kurikulum Merdeka (Fase D) Indonesia untuk mata pelajaran ${meta.mapel}.
-TUGAS UTAMA: Perlakukan input pengguna sebagai INSTRUKSI/SPESIFIKASI penyusunan soal dengan mengacu pada standar kualitas pada tautan referensi ${GEMINI_SHARE_REFERENCE_URL}. Jangan pernah menjadikan teks prompt/instruksi sebagai teks soal.
+TUGAS UTAMA: Perlakukan input pengguna sebagai INSTRUKSI/SPESIFIKASI penyusunan soal. Jangan pernah menjadikan teks prompt/instruksi sebagai teks soal.
 Susun soal-soal baru yang bermutu tinggi, kontekstual, akurat secara keilmuan sesuai kaidah ${meta.mapel}, bebas dari pengulangan kalimat, dan sesuai tingkat perkembangan siswa SMP kelas ${meta.kelas}.
 ${isPai ? 'Untuk Pendidikan Agama Islam, sertakan kutipan ayat Al-Qur\'an atau Hadis berharakat lengkap dan jelas beserta sumber surat/ayat pada butir soal yang relevan.' : ''}
 ${isBahasInggris ? 'Untuk Bahasa Inggris, gunakan bahasa Inggris yang natural dan sesuai jenjang SMP Fase D untuk stimulus, pertanyaan, dan pilihan jawaban.' : ''}
@@ -1775,282 +1984,250 @@ Pastikan penomoran soal berurutan mulai dari 1 hingga ${meta.totalSoal} (urutan:
 Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa Inggris/Indonesia jika butir soal tersebut membutuhkan ilustrasi gambar, atau string kosong "" jika tidak butuh gambar.`;
 
       const payload = {
-        systemInstruction: { parts: [{ text: systemInstruction }] },
         contents: [{ parts: [{ text: prompt }] }],
+        systemInstruction: { parts: [{ text: systemInstruction }] },
         generationConfig: {
-          temperature: 0.7,
-          responseMimeType: 'application/json',
+          responseMimeType: "application/json",
           responseSchema: {
-            type: 'OBJECT',
+            type: "OBJECT",
             properties: {
               pg_sederhana: {
-                type: 'ARRAY',
+                type: "ARRAY",
                 items: {
-                  type: 'OBJECT',
+                  type: "OBJECT",
                   properties: {
-                    nomor: { type: 'INTEGER' },
-                    level_kognitif: { type: 'STRING' },
-                    indikator_soal: { type: 'STRING' },
-                    stimulus: { type: 'STRING' },
-                    gambar_kata_kunci: { type: 'STRING' },
-                    teks_arab: { type: 'STRING' },
-                    sumber_arab: { type: 'STRING' },
-                    pertanyaan: { type: 'STRING' },
-                    opsi_a: { type: 'STRING' },
-                    opsi_b: { type: 'STRING' },
-                    opsi_c: { type: 'STRING' },
-                    opsi_d: { type: 'STRING' },
-                    kunci: { type: 'STRING' },
-                    pembahasan: { type: 'STRING' }
+                    nomor: { type: "INTEGER" },
+                    level_kognitif: { type: "STRING" },
+                    indikator_soal: { type: "STRING" },
+                    stimulus: { type: "STRING" },
+                    gambar_kata_kunci: { type: "STRING" },
+                    teks_arab: { type: "STRING" },
+                    sumber_arab: { type: "STRING" },
+                    pertanyaan: { type: "STRING" },
+                    opsi_A: { type: "STRING" },
+                    opsi_B: { type: "STRING" },
+                    opsi_C: { type: "STRING" },
+                    opsi_D: { type: "STRING" },
+                    kunci: { type: "STRING" },
+                    pembahasan: { type: "STRING" }
                   },
-                  required: ['nomor', 'pertanyaan', 'opsi_a', 'opsi_b', 'opsi_c', 'opsi_d', 'kunci', 'pembahasan']
+                  required: ["nomor", "level_kognitif", "indikator_soal", "stimulus", "pertanyaan", "opsi_A", "opsi_B", "opsi_C", "opsi_D", "kunci", "pembahasan"]
                 }
               },
               pg_kompleks: {
-                type: 'ARRAY',
+                type: "ARRAY",
                 items: {
-                  type: 'OBJECT',
+                  type: "OBJECT",
                   properties: {
-                    nomor: { type: 'INTEGER' },
-                    level_kognitif: { type: 'STRING' },
-                    indikator_soal: { type: 'STRING' },
-                    stimulus: { type: 'STRING' },
-                    gambar_kata_kunci: { type: 'STRING' },
-                    teks_arab: { type: 'STRING' },
-                    sumber_arab: { type: 'STRING' },
-                    pertanyaan: { type: 'STRING' },
-                    opsi: { type: 'ARRAY', items: { type: 'STRING' } },
-                    kunci: { type: 'ARRAY', items: { type: 'STRING' } },
-                    pembahasan: { type: 'STRING' }
+                    nomor: { type: "INTEGER" },
+                    level_kognitif: { type: "STRING" },
+                    indikator_soal: { type: "STRING" },
+                    stimulus: { type: "STRING" },
+                    gambar_kata_kunci: { type: "STRING" },
+                    teks_arab: { type: "STRING" },
+                    sumber_arab: { type: "STRING" },
+                    pertanyaan: { type: "STRING" },
+                    opsi: { type: "ARRAY", items: { type: "STRING" } },
+                    kunci: { type: "ARRAY", items: { type: "STRING" } },
+                    pembahasan: { type: "STRING" }
                   },
-                  required: ['nomor', 'pertanyaan', 'opsi', 'kunci', 'pembahasan']
+                  required: ["nomor", "level_kognitif", "indikator_soal", "stimulus", "pertanyaan", "opsi", "kunci", "pembahasan"]
                 }
               },
               benar_salah: {
-                type: 'ARRAY',
+                type: "ARRAY",
                 items: {
-                  type: 'OBJECT',
+                  type: "OBJECT",
                   properties: {
-                    nomor: { type: 'INTEGER' },
-                    level_kognitif: { type: 'STRING' },
-                    indikator_soal: { type: 'STRING' },
-                    stimulus: { type: 'STRING' },
-                    gambar_kata_kunci: { type: 'STRING' },
-                    teks_arab: { type: 'STRING' },
-                    sumber_arab: { type: 'STRING' },
-                    pertanyaan: { type: 'STRING' },
+                    nomor: { type: "INTEGER" },
+                    level_kognitif: { type: "STRING" },
+                    indikator_soal: { type: "STRING" },
+                    stimulus: { type: "STRING" },
+                    gambar_kata_kunci: { type: "STRING" },
+                    teks_arab: { type: "STRING" },
+                    sumber_arab: { type: "STRING" },
+                    pertanyaan: { type: "STRING" },
                     pernyataan: {
-                      type: 'ARRAY',
+                      type: "ARRAY",
                       items: {
-                        type: 'OBJECT',
+                        type: "OBJECT",
                         properties: {
-                          teks: { type: 'STRING' },
-                          jawaban: { type: 'STRING' }
+                          teks: { type: "STRING" },
+                          jawaban: { type: "STRING" }
                         },
-                        required: ['teks', 'jawaban']
+                        required: ["teks", "jawaban"]
                       }
                     },
-                    pembahasan: { type: 'STRING' }
+                    pembahasan: { type: "STRING" }
                   },
-                  required: ['nomor', 'pertanyaan', 'pernyataan', 'pembahasan']
+                  required: ["nomor", "level_kognitif", "indikator_soal", "stimulus", "pertanyaan", "pernyataan", "pembahasan"]
                 }
               },
               menjodohkan: {
-                type: 'ARRAY',
+                type: "ARRAY",
                 items: {
-                  type: 'OBJECT',
+                  type: "OBJECT",
                   properties: {
-                    nomor: { type: 'INTEGER' },
-                    level_kognitif: { type: 'STRING' },
-                    indikator_soal: { type: 'STRING' },
-                    stimulus: { type: 'STRING' },
-                    gambar_kata_kunci: { type: 'STRING' },
-                    pertanyaan: { type: 'STRING' },
+                    nomor: { type: "INTEGER" },
+                    level_kognitif: { type: "STRING" },
+                    indikator_soal: { type: "STRING" },
+                    stimulus: { type: "STRING" },
+                    gambar_kata_kunci: { type: "STRING" },
+                    pertanyaan: { type: "STRING" },
                     premis: {
-                      type: 'ARRAY',
+                      type: "ARRAY",
                       items: {
-                        type: 'OBJECT',
+                        type: "OBJECT",
                         properties: {
-                          id: { type: 'STRING' },
-                          teks: { type: 'STRING' }
+                          id: { type: "STRING" },
+                          teks: { type: "STRING" }
                         },
-                        required: ['id', 'teks']
+                        required: ["id", "teks"]
                       }
                     },
                     respon: {
-                      type: 'ARRAY',
+                      type: "ARRAY",
                       items: {
-                        type: 'OBJECT',
+                        type: "OBJECT",
                         properties: {
-                          id: { type: 'STRING' },
-                          teks: { type: 'STRING' }
+                          id: { type: "STRING" },
+                          teks: { type: "STRING" }
                         },
-                        required: ['id', 'teks']
+                        required: ["id", "teks"]
                       }
                     },
                     pasangan: {
-                      type: 'ARRAY',
+                      type: "ARRAY",
                       items: {
-                        type: 'OBJECT',
+                        type: "OBJECT",
                         properties: {
-                          premis_id: { type: 'STRING' },
-                          respon_id: { type: 'STRING' }
+                          premis_id: { type: "STRING" },
+                          respon_id: { type: "STRING" }
                         },
-                        required: ['premis_id', 'respon_id']
+                        required: ["premis_id", "respon_id"]
                       }
                     },
-                    pembahasan: { type: 'STRING' }
+                    pembahasan: { type: "STRING" }
                   },
-                  required: ['nomor', 'pertanyaan', 'premis', 'respon', 'pasangan', 'pembahasan']
+                  required: ["nomor", "level_kognitif", "indikator_soal", "stimulus", "pertanyaan", "premis", "respon", "pasangan", "pembahasan"]
                 }
               },
               esai: {
-                type: 'ARRAY',
+                type: "ARRAY",
                 items: {
-                  type: 'OBJECT',
+                  type: "OBJECT",
                   properties: {
-                    nomor: { type: 'INTEGER' },
-                    level_kognitif: { type: 'STRING' },
-                    indikator_soal: { type: 'STRING' },
-                    stimulus: { type: 'STRING' },
-                    gambar_kata_kunci: { type: 'STRING' },
-                    teks_arab: { type: 'STRING' },
-                    sumber_arab: { type: 'STRING' },
-                    pertanyaan: { type: 'STRING' },
-                    kunci_jawaban: { type: 'STRING' },
+                    nomor: { type: "INTEGER" },
+                    level_kognitif: { type: "STRING" },
+                    indikator_soal: { type: "STRING" },
+                    stimulus: { type: "STRING" },
+                    gambar_kata_kunci: { type: "STRING" },
+                    teks_arab: { type: "STRING" },
+                    sumber_arab: { type: "STRING" },
+                    pertanyaan: { type: "STRING" },
+                    kunci_jawaban: { type: "STRING" },
                     rubrik_skor: {
-                      type: 'ARRAY',
+                      type: "ARRAY",
                       items: {
-                        type: 'OBJECT',
+                        type: "OBJECT",
                         properties: {
-                          kriteria: { type: 'STRING' },
-                          skor: { type: 'INTEGER' }
+                          kriteria: { type: "STRING" },
+                          skor: { type: "INTEGER" }
                         },
-                        required: ['kriteria', 'skor']
+                        required: ["kriteria", "skor"]
                       }
                     },
-                    skor_maksimal: { type: 'INTEGER' }
+                    skor_maksimal: { type: "INTEGER" }
                   },
-                  required: ['nomor', 'pertanyaan', 'kunci_jawaban', 'rubrik_skor']
+                  required: ["nomor", "level_kognitif", "indikator_soal", "stimulus", "pertanyaan", "kunci_jawaban", "rubrik_skor", "skor_maksimal"]
                 }
               }
             },
-            required: ['pg_sederhana', 'pg_kompleks', 'benar_salah', 'menjodohkan', 'esai']
+            required: ["pg_sederhana", "pg_kompleks", "benar_salah", "menjodohkan", "esai"]
           }
         }
       };
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 35000);
-      let resp;
-      try {
-        resp = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            signal: controller.signal
-          }
-        );
-      } finally {
-        clearTimeout(timeoutId);
-      }
+      const raw = await callGeminiWithRetry(payload);
+      const usedUrlsGlobal = new Set();
 
-      if (!resp.ok) {
-        const errData = await resp.json().catch(() => ({}));
-        throw new Error(errData?.error?.message || `HTTP ${resp.status}`);
-      }
-
-      const resJson = await resp.json();
-      const rawText = resJson?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      if (!rawText) throw new Error('Respons Gemini AI kosong.');
-
-      const parsed = JSON.parse(rawText);
-      const usedUrls = new Set();
-
-      const attachImageIfRequested = async (item, index, neededImgCount, fallbackNo) => {
-        // Hanya tampilkan gambar jika jumlah gambar yang diminta pada bagian soal ini > 0 dan indeks berada dalam batas tersebut
-        const shouldHaveImg = neededImgCount > 0 && index < neededImgCount;
-        if (!shouldHaveImg) return { url: '', caption: '' };
-        const qKey = (item.gambar_kata_kunci || `${item.stimulus || ''} ${item.pertanyaan || ''} ${meta.materi}`).slice(0, 140);
-        const candidates = await fetchRealTopicImages(qKey, meta.mapel, 5);
-        const picked = candidates.find((c) => !usedUrls.has(c.url)) || candidates[0];
+      const attachImageIfNeeded = async (item, idx, targetImgCount, fallbackNomor) => {
+        const no = item.nomor || fallbackNomor;
+        if (idx >= targetImgCount) return { gambar_url: '', gambar_caption: '' };
+        const queryTopic = (item.gambar_kata_kunci || `${item.stimulus || ''} ${item.pertanyaan || ''} ${meta.materi}`).slice(0, 140);
+        const candidates = await fetchRealTopicImages(queryTopic, meta.mapel, 6);
+        const picked = candidates.find((c) => !usedUrlsGlobal.has(c.url)) || candidates[0];
         if (picked) {
-          usedUrls.add(picked.url);
-          return { url: picked.url, caption: `Gambar ${fallbackNo}. ${item.gambar_kata_kunci || picked.caption}` };
+          usedUrlsGlobal.add(picked.url);
+          return { gambar_url: picked.url, gambar_caption: `Gambar ${no}. ${picked.caption}` };
         }
         return {
-          url: createIllustrationDataUrl(meta.mapel, meta.materi, fallbackNo, qKey),
-          caption: `Gambar ${fallbackNo}. Ilustrasi ${meta.materi}`
+          gambar_url: createIllustrationDataUrl(meta.mapel, meta.materi, no, queryTopic),
+          gambar_caption: `Gambar ${no}. Ilustrasi ${meta.materi}`
         };
       };
 
       let runningNo = 1;
-
       const pg_sederhana = [];
-      const rawPg = Array.isArray(parsed.pg_sederhana) ? parsed.pg_sederhana : [];
-      for (let i = 0; i < rawPg.length; i++) {
-        const it = rawPg[i];
+      for (let i = 0; i < (raw.pg_sederhana || []).length; i++) {
+        const it = raw.pg_sederhana[i];
         const no = runningNo++;
-        const imgAsset = await attachImageIfRequested(it, i, meta.gambarPgSederhana, no);
+        const img = await attachImageIfNeeded(it, i, meta.gambarPgSederhana, no);
         pg_sederhana.push({
           nomor: no,
           level_kognitif: it.level_kognitif || getLevelLabelByIndex(i, meta.kesulitan),
-          indikator_soal: it.indikator_soal || `Disajikan konteks materi ${meta.materi}, peserta didik dapat menentukan jawaban yang tepat.`,
+          indikator_soal: it.indikator_soal || '',
           stimulus: it.stimulus || '',
-          gambar_url: imgAsset.url,
-          gambar_caption: imgAsset.caption,
+          gambar_url: img.gambar_url,
+          gambar_caption: img.gambar_caption,
           teks_arab: it.teks_arab || '',
           sumber_arab: it.sumber_arab || '',
           pertanyaan: it.pertanyaan || '',
-          opsi: {
-            A: it.opsi_a || '',
-            B: it.opsi_b || '',
-            C: it.opsi_c || '',
-            D: it.opsi_d || ''
-          },
-          kunci: String(it.kunci || 'A').trim().toUpperCase().charAt(0),
+          opsi: { A: it.opsi_A || '', B: it.opsi_B || '', C: it.opsi_C || '', D: it.opsi_D || '' },
+          kunci: (it.kunci || 'A').trim().toUpperCase().charAt(0),
           pembahasan: it.pembahasan || ''
         });
       }
 
       const pg_kompleks = [];
-      const rawPgk = Array.isArray(parsed.pg_kompleks) ? parsed.pg_kompleks : [];
-      for (let i = 0; i < rawPgk.length; i++) {
-        const it = rawPgk[i];
+      for (let i = 0; i < (raw.pg_kompleks || []).length; i++) {
+        const it = raw.pg_kompleks[i];
         const no = runningNo++;
-        const imgAsset = await attachImageIfRequested(it, i, meta.gambarPgKompleks, no);
-        const normOpsi = normalizePgkOptions(it.opsi || []);
+        const img = await attachImageIfNeeded(it, i, meta.gambarPgKompleks, no);
+        const opsiNorm = normalizePgkOptions(it.opsi || []);
+        const validLetters = opsiNorm.map((o) => o.huruf);
+        let kunciArr = (Array.isArray(it.kunci) ? it.kunci : [it.kunci])
+          .map((k) => String(k || '').trim().toUpperCase().charAt(0))
+          .filter((k) => validLetters.includes(k));
+        if (kunciArr.length === 0 && validLetters.length >= 2) kunciArr = [validLetters[0], validLetters[1]];
         pg_kompleks.push({
           nomor: no,
           level_kognitif: it.level_kognitif || getLevelLabelByIndex(i + 1, meta.kesulitan),
-          indikator_soal: it.indikator_soal || `Disajikan pernyataan mengenai ${meta.materi}, peserta didik dapat memilih lebih dari satu jawaban benar.`,
+          indikator_soal: it.indikator_soal || '',
           stimulus: it.stimulus || '',
-          gambar_url: imgAsset.url,
-          gambar_caption: imgAsset.caption,
+          gambar_url: img.gambar_url,
+          gambar_caption: img.gambar_caption,
           teks_arab: it.teks_arab || '',
           sumber_arab: it.sumber_arab || '',
           pertanyaan: it.pertanyaan || '',
-          opsi: normOpsi,
-          kunci: Array.isArray(it.kunci) ? it.kunci.map((k) => String(k).trim().toUpperCase().charAt(0)) : ['A', 'B'],
+          opsi: opsiNorm,
+          kunci: kunciArr,
           pembahasan: it.pembahasan || ''
         });
       }
 
       const benar_salah = [];
-      const rawBs = Array.isArray(parsed.benar_salah) ? parsed.benar_salah : [];
-      for (let i = 0; i < rawBs.length; i++) {
-        const it = rawBs[i];
+      for (let i = 0; i < (raw.benar_salah || []).length; i++) {
+        const it = raw.benar_salah[i];
         const no = runningNo++;
-        const imgAsset = await attachImageIfRequested(it, i, meta.gambarBenarSalah, no);
+        const img = await attachImageIfNeeded(it, i, meta.gambarBenarSalah, no);
         benar_salah.push({
           nomor: no,
           level_kognitif: it.level_kognitif || getLevelLabelByIndex(i + 2, meta.kesulitan),
-          indikator_soal: it.indikator_soal || `Disajikan tabel pernyataan tentang ${meta.materi}, peserta didik dapat mengevaluasi nilai kebenarannya.`,
+          indikator_soal: it.indikator_soal || '',
           stimulus: it.stimulus || '',
-          gambar_url: imgAsset.url,
-          gambar_caption: imgAsset.caption,
+          gambar_url: img.gambar_url,
+          gambar_caption: img.gambar_caption,
           teks_arab: it.teks_arab || '',
           sumber_arab: it.sumber_arab || '',
           pertanyaan: it.pertanyaan || '',
@@ -2060,59 +2237,48 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
       }
 
       const menjodohkan = [];
-      const rawMj = Array.isArray(parsed.menjodohkan) ? parsed.menjodohkan : [];
-      for (let i = 0; i < rawMj.length; i++) {
-        const it = rawMj[i];
+      for (let i = 0; i < (raw.menjodohkan || []).length; i++) {
+        const it = raw.menjodohkan[i];
         const no = runningNo++;
-        const imgAsset = await attachImageIfRequested(it, i, meta.gambarMenjodohkan, no);
-        const kunciMap = {};
-        if (Array.isArray(it.pasangan)) {
-          it.pasangan.forEach((p) => {
-            if (p.premis_id && p.respon_id) {
-              kunciMap[String(p.premis_id).trim()] = String(p.respon_id).trim().toUpperCase();
-            }
-          });
-        }
+        const img = await attachImageIfNeeded(it, i, meta.gambarMenjodohkan, no);
+        const kunciPasangan = {};
+        (it.pasangan || []).forEach((p) => {
+          if (p.premis_id && p.respon_id) kunciPasangan[String(p.premis_id)] = String(p.respon_id).toUpperCase();
+        });
         menjodohkan.push({
           nomor: no,
           level_kognitif: it.level_kognitif || getLevelLabelByIndex(i + 1, meta.kesulitan),
-          indikator_soal: it.indikator_soal || `Disajikan premis dan respon mengenai ${meta.materi}, peserta didik dapat memasangkannya secara akurat.`,
+          indikator_soal: it.indikator_soal || '',
           stimulus: it.stimulus || '',
-          gambar_url: imgAsset.url,
-          gambar_caption: imgAsset.caption,
+          gambar_url: img.gambar_url,
+          gambar_caption: img.gambar_caption,
           pertanyaan: it.pertanyaan || '',
-          premis: Array.isArray(it.premis) ? it.premis : [],
-          respon: Array.isArray(it.respon) ? it.respon : [],
-          kunci_pasangan: kunciMap,
+          premis: it.premis || [],
+          respon: it.respon || [],
+          kunci_pasangan: kunciPasangan,
           pembahasan: it.pembahasan || ''
         });
       }
 
       const esai = [];
-      const rawEsai = Array.isArray(parsed.esai) ? parsed.esai : [];
-      for (let i = 0; i < rawEsai.length; i++) {
-        const it = rawEsai[i];
+      for (let i = 0; i < (raw.esai || []).length; i++) {
+        const it = raw.esai[i];
         const no = runningNo++;
-        const imgAsset = await attachImageIfRequested(it, i, meta.gambarEsai, no);
+        const img = await attachImageIfNeeded(it, i, meta.gambarEsai, no);
         esai.push({
           nomor: no,
           level_kognitif: it.level_kognitif || 'L3 (C5)',
-          indikator_soal: it.indikator_soal || `Disajikan studi kasus tentang ${meta.materi}, peserta didik dapat menganalisis dan merumuskan solusi.`,
+          indikator_soal: it.indikator_soal || '',
           stimulus: it.stimulus || '',
-          gambar_url: imgAsset.url,
-          gambar_caption: imgAsset.caption,
+          gambar_url: img.gambar_url,
+          gambar_caption: img.gambar_caption,
           teks_arab: it.teks_arab || '',
           sumber_arab: it.sumber_arab || '',
           pertanyaan: it.pertanyaan || '',
           kunci_jawaban: it.kunci_jawaban || '',
-          rubrik_skor: Array.isArray(it.rubrik_skor) ? it.rubrik_skor : [],
+          rubrik_skor: it.rubrik_skor || [],
           skor_maksimal: it.skor_maksimal || 4
         });
-      }
-
-      const totalReceived = pg_sederhana.length + pg_kompleks.length + benar_salah.length + menjodohkan.length + esai.length;
-      if (totalReceived === 0) {
-        throw new Error('Gemini AI belum mengembalikan butir soal yang valid.');
       }
 
       return { pg_sederhana, pg_kompleks, benar_salah, menjodohkan, esai };
@@ -2124,7 +2290,7 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
       if (!meta) return;
 
       currentMeta = meta;
-      const promptText = buildStructuredPromptFromMeta(meta);
+
       const btnGenerate = document.getElementById('btn-generate');
       const emptyState = document.getElementById('empty-state');
       const loadingState = document.getElementById('loading-state');
@@ -2133,38 +2299,35 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
       const toolbar = document.getElementById('result-toolbar');
 
       if (btnGenerate) btnGenerate.disabled = true;
-      updateGeminiSyncBadge('Menyusun via Gemini...', 'amber');
       emptyState?.classList.add('hidden');
       docContainer?.classList.add('hidden');
       quizContainer?.classList.add('hidden');
       toolbar?.classList.add('hidden');
       loadingState?.classList.remove('hidden');
+      updateGeminiSyncBadge('Sedang Menyusun...', 'amber');
       startLoadingTimer();
 
       try {
-        let structured = null;
-        let toastMsg = '';
+        let structured;
+        let sourceLabel = `Paket soal ${meta.mapel} (${meta.totalSoal} butir) berhasil disusun oleh Gemini AI.`;
         try {
-          structured = await fetchQuestionsFromGeminiApi(meta, promptText);
-          updateGeminiSyncBadge('Tersusun (Gemini AI)', 'emerald');
-          toastMsg = `Paket soal ${meta.mapel} (${meta.totalSoal} butir) berhasil disusun oleh Gemini AI!`;
-        } catch (aiErr) {
-          console.warn('Fallback ke generator internal:', aiErr);
+          structured = await generateQuestionsWithGemini(meta);
+        } catch (geminiErr) {
           structured = await generateQuestionsAutomatically(meta);
-          updateGeminiSyncBadge('Tersusun (Mode Standar)', 'emerald');
-          toastMsg = `Paket soal ${meta.mapel} (${meta.totalSoal} butir) selesai disusun!`;
+          sourceLabel = `Paket soal ${meta.mapel} (${meta.totalSoal} butir) berhasil disusun di panel kanan.`;
         }
 
         stopLoadingTimer();
         currentGeneratedData = structured;
         currentTab = 'semua';
+        updateGeminiSyncBadge('Tersusun di Panel Kanan', 'emerald');
 
         loadingState?.classList.add('hidden');
-        renderGeneratedExamWorkspace(toastMsg);
+        renderGeneratedExamWorkspace(sourceLabel);
       } catch (err) {
         stopLoadingTimer();
         loadingState?.classList.add('hidden');
-        updateGeminiSyncBadge('Gagal Menyusun', 'rose');
+        updateGeminiSyncBadge('API Terhubung Otomatis', 'emerald');
         if (currentGeneratedData) {
           toolbar?.classList.remove('hidden');
           docContainer?.classList.remove('hidden');
@@ -2174,6 +2337,24 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
         showToast(err.message || 'Terjadi kendala saat menyusun soal.', 'error');
       } finally {
         if (btnGenerate) btnGenerate.disabled = false;
+      }
+    }
+
+    function startLoadingTimer() {
+      stopLoadingTimer();
+      const startTime = Date.now();
+      const badge = document.getElementById('loading-timer-badge');
+      if (badge) badge.textContent = 'Waktu proses: 0 detik';
+      loadingTimerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        if (badge) badge.textContent = `Waktu proses: ${elapsed} detik`;
+      }, 1000);
+    }
+
+    function stopLoadingTimer() {
+      if (loadingTimerInterval) {
+        clearInterval(loadingTimerInterval);
+        loadingTimerInterval = null;
       }
     }
 
@@ -2195,7 +2376,7 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
     }
 
     /* ==========================================================================
-       3. LOGO KOP SURAT & RESET WORKSPACE
+       5. PENGELOLAAN LOGO KOP SURAT
        ========================================================================== */
     function loadSavedLogos() {
       try {
@@ -2295,12 +2476,12 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
 
       updateTotalBadge();
       updateLogoPreviewSlots();
-      updateGeminiSyncBadge('Siap Menyusun', 'emerald');
+      updateGeminiSyncBadge('API Terhubung Otomatis', 'emerald');
       showToast('Formulir dan lembar kerja telah dikosongkan. Siap menyusun soal baru.', 'info');
     }
 
     /* ==========================================================================
-       4. PERENDER KOMPONEN DOKUMEN (KOP SURAT, ARAB PAI, KISI-KISI)
+       6. RENDER DOKUMEN NASKAH SOAL, KUNCI, KISI-KISI & ANALISIS
        ========================================================================== */
     function getCognitiveBadgeHtml() {
       return '';
@@ -2326,7 +2507,7 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
         const emergencyPhotoUrl = `https://loremflickr.com/560/320/${fallbackTopicTag},school/all?lock=${q.nomor * 17}`;
         return `
           <div style="margin: 6px 0 8px 0; text-align: center;">
-            <img src="${escapeHtml(q.gambar_url)}" alt="Gambar Soal ${q.nomor}" onerror="if(!this.dataset.retried){this.dataset.retried='1';this.src='${emergencyPhotoUrl}';}" style="max-width: 380px; max-height: 230px; width: auto; height: auto; border: 1px solid #cbd5e1; border-radius: 6px; margin: 0 auto; display: block; object-fit: contain; background: #f8fafc;" />
+            <img src="${escapeHtml(q.gambar_url)}" alt="Gambar Soal ${q.nomor}" crossorigin="anonymous" onerror="if(!this.dataset.retried){this.dataset.retried='1';this.src='${emergencyPhotoUrl}';}" style="max-width: 380px; max-height: 230px; width: auto; height: auto; border: 1px solid #cbd5e1; border-radius: 6px; margin: 0 auto; display: block; object-fit: contain; background: #f8fafc;" />
             ${q.gambar_caption ? `<div style="font-size: 9pt; font-style: italic; color: #475569; margin-top: 4px;">${escapeHtml(q.gambar_caption)}</div>` : ''}
             <div class="no-print" style="margin-top: 4px;">
               <button type="button" onclick="refreshSingleQuestionRealImage('${sectionKey}', ${idx})" class="px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 text-[10px] font-semibold cursor-pointer mr-1">Cari Gambar Riil Lain</button>
@@ -2335,17 +2516,6 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
             </div>
           </div>
         `;
-      }
-      // Jangan tampilkan gambar maupun tombol penyisipan gambar jika pengguna tidak memilih gambar pada bagian soal ini
-      const requestedMap = {
-        pg_sederhana: currentMeta?.gambarPgSederhana || 0,
-        pg_kompleks: currentMeta?.gambarPgKompleks || 0,
-        benar_salah: currentMeta?.gambarBenarSalah || 0,
-        menjodohkan: currentMeta?.gambarMenjodohkan || 0,
-        esai: currentMeta?.gambarEsai || 0
-      };
-      if ((requestedMap[sectionKey] || 0) <= 0) {
-        return '';
       }
       return `
         <div class="no-print" style="margin: 3px 0 4px 0;">
@@ -2404,7 +2574,7 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
             <td>${escapeHtml(meta.mapel)}</td>
             <td><strong>Nama Siswa</strong></td>
             <td>:</td>
-            <td>..........................................</td>
+            <td><span style="display: inline-block; width: 96%; border-bottom: 1px dotted #334155; height: 12px;">&nbsp;</span></td>
           </tr>
           <tr>
             <td><strong>Kelas / Fase</strong></td>
@@ -2412,7 +2582,7 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
             <td>Kelas ${escapeHtml(meta.kelas)} SMP (Fase D)</td>
             <td><strong>Nomor Peserta</strong></td>
             <td>:</td>
-            <td>..........................................</td>
+            <td><span style="display: inline-block; width: 96%; border-bottom: 1px dotted #334155; height: 12px;">&nbsp;</span></td>
           </tr>
           <tr>
             <td><strong>Materi Pokok</strong></td>
@@ -2433,10 +2603,6 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
       const container = document.getElementById('document-container');
 
       let html = '';
-
-      /* ======================================================================
-         BAGIAN 1: NASKAH SOAL UTAMA
-         ====================================================================== */
       html += `<div id="doc-section-naskah">`;
       html += renderKopAndIdentityHtml(m, editableJudulAsesmen);
 
@@ -2451,7 +2617,6 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
         </div>
       `;
 
-      // A. Pilihan Ganda Sederhana
       if (d.pg_sederhana.length > 0) {
         html += `
           <div style="font-size: 11pt; font-weight: bold; margin: 12px 0 6px 0; text-transform: uppercase;">
@@ -2498,7 +2663,6 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
         });
       }
 
-      // B. Pilihan Ganda Kompleks
       if (d.pg_kompleks.length > 0) {
         html += `
           <div style="font-size: 11pt; font-weight: bold; margin: 14px 0 6px 0; text-transform: uppercase;">
@@ -2547,7 +2711,6 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
         });
       }
 
-      // C. Benar / Salah (Tabel AKM Sejajar Presisi)
       if (d.benar_salah.length > 0) {
         html += `
           <div style="font-size: 11pt; font-weight: bold; margin: 14px 0 6px 0; text-transform: uppercase;">
@@ -2602,8 +2765,8 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
                                 </tr>
                               </table>
                             </td>
-                            <td style="text-align: center;">&#9744;</td>
-                            <td style="text-align: center;">&#9744;</td>
+                            <td style="text-align: center; vertical-align: middle;">&#9744;</td>
+                            <td style="text-align: center; vertical-align: middle;">&#9744;</td>
                           </tr>
                         `).join('')}
                       </tbody>
@@ -2616,7 +2779,6 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
         });
       }
 
-      // D. Menjodohkan (Format AKM)
       if (d.menjodohkan.length > 0) {
         html += `
           <div style="font-size: 11pt; font-weight: bold; margin: 14px 0 6px 0; text-transform: uppercase;">
@@ -2637,17 +2799,12 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
             const resItem = responList[r];
             rowsHtml += `
               <tr>
-                <td>
-                  ${p ? `<strong>${escapeHtml(p.id || String(r + 1))}.</strong> ${formatRichText(p.teks || '')}` : ''}
-                </td>
+                <td>${p ? `<strong>${escapeHtml(p.id || String(r + 1))}.</strong> ${formatRichText(p.teks || '')}` : ''}</td>
                 <td style="text-align: center;">${p ? '( ..... )' : ''}</td>
-                <td>
-                  ${resItem ? `<strong>${escapeHtml(resItem.id || getAlphabetLabel(r))}.</strong> ${formatRichText(resItem.teks || '')}` : ''}
-                </td>
+                <td>${resItem ? `<strong>${escapeHtml(resItem.id || getAlphabetLabel(r))}.</strong> ${formatRichText(resItem.teks || '')}` : ''}</td>
               </tr>
             `;
           }
-
           html += `
             <div class="soal-block">
               <table class="soal-table">
@@ -2684,7 +2841,6 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
         });
       }
 
-      // E. Esai / Uraian HOTS
       if (d.esai.length > 0) {
         html += `
           <div style="font-size: 11pt; font-weight: bold; margin: 14px 0 6px 0; text-transform: uppercase;">
@@ -2719,9 +2875,6 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
       }
       html += `</div>`;
 
-      /* ======================================================================
-         BAGIAN 2: KUNCI JAWABAN, PEMBAHASAN & RUBRIK PENSKORAN
-         ====================================================================== */
       html += `<div id="doc-section-kunci" class="page-break-before" style="margin-top: 28px; padding-top: 18px; border-top: 2px dashed #94a3b8;">`;
       html += renderKopAndIdentityHtml(m, 'KUNCI JAWABAN, PEMBAHASAN, & RUBRIK PENSKORAN');
 
@@ -2789,9 +2942,6 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
       }
       html += `</div>`;
 
-      /* ======================================================================
-         BAGIAN 3: KISI-KISI & KARTU SOAL
-         ====================================================================== */
       const allItems = [
         ...d.pg_sederhana.map((q) => ({ ...q, bentuk: 'PG Sederhana', kunciRingkas: q.kunci })),
         ...d.pg_kompleks.map((q) => ({ ...q, bentuk: 'PG Kompleks', kunciRingkas: (Array.isArray(q.kunci) ? q.kunci : [q.kunci]).join(', ') })),
@@ -2802,7 +2952,6 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
 
       html += `<div id="doc-section-kisikisi" class="page-break-before" style="margin-top: 28px; padding-top: 18px; border-top: 2px dashed #94a3b8;">`;
       html += renderKopAndIdentityHtml(m, 'KISI-KISI PENULISAN SOAL & KARTU SOAL');
-
       html += `<div style="font-weight: bold; margin: 8px 0 6px 0; font-size: 11pt;">I. TABEL KISI-KISI PENULISAN SOAL</div>`;
       html += `
         <table class="akm-grid-table">
@@ -2876,9 +3025,6 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
       });
       html += `</div>`;
 
-      /* ======================================================================
-         BAGIAN 4: ANALISIS KOGNITIF & TELAAH INSTRUMEN
-         ====================================================================== */
       let countL1 = 0;
       let countL2 = 0;
       let countL3 = 0;
@@ -2956,9 +3102,6 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
       container.innerHTML = html;
     }
 
-    /* ==========================================================================
-       5. NAVIGASI TAB & MODE KUIS INTERAKTIF
-       ========================================================================== */
     function switchTab(tabName) {
       currentTab = tabName;
       const tabIds = ['semua', 'naskah', 'kunci', 'kisikisi', 'analisis', 'kuis'];
@@ -2998,6 +3141,9 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
       if (secAnalisis) secAnalisis.classList.toggle('hidden', tabName !== 'semua' && tabName !== 'analisis');
     }
 
+    /* ==========================================================================
+       7. MODE KUIS INTERAKTIF
+       ========================================================================== */
     function renderInteractiveQuiz() {
       if (!currentGeneratedData || !currentMeta) return;
       const d = currentGeneratedData;
@@ -3230,46 +3376,519 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
     }
 
     /* ==========================================================================
-       6. CETAK PDF, SALIN TEKS, & EKSPOR WORD (.DOC MHTML DENGAN GAMBAR TERSEMAT)
+       8. EKSPOR PDF LANGSUNG (PAGINASI A4 PRESISI) & CETAK PRINTER
        ========================================================================== */
-    function printExam() {
-      if (!currentGeneratedData || !currentMeta) {
-        showToast('Silakan buat paket soal terlebih dahulu sebelum mencetak PDF.', 'error');
-        return;
-      }
-
-      if (currentTab === 'kuis') {
-        switchTab('semua');
-      }
-
+    function buildCleanExportClone(forPrint = false) {
       const docEl = document.getElementById('document-container');
-      if (!docEl || docEl.classList.contains('hidden')) {
-        showToast('Lembar naskah belum tersedia untuk dicetak.', 'error');
-        return;
-      }
+      if (!docEl) return null;
 
       const clone = docEl.cloneNode(true);
       clone.querySelectorAll('.no-print, .hidden').forEach((el) => el.remove());
+      clone.querySelectorAll('[contenteditable]').forEach((el) => el.removeAttribute('contenteditable'));
 
-      const existingPrintFrame = document.getElementById('pdf-print-iframe');
-      if (existingPrintFrame) existingPrintFrame.remove();
+      const visibleSections = Array.from(clone.children).filter((child) => child.id && child.id.startsWith('doc-section-'));
+      visibleSections.forEach((sec, idx) => {
+        sec.style.marginTop = '0';
+        sec.style.paddingTop = '0';
+        sec.style.borderTop = 'none';
+        if (forPrint && idx > 0) {
+          sec.classList.add('page-break-before');
+        } else {
+          sec.classList.remove('page-break-before');
+        }
+      });
 
-      const iframe = document.createElement('iframe');
-      iframe.id = 'pdf-print-iframe';
-      iframe.style.position = 'fixed';
-      iframe.style.right = '0';
-      iframe.style.bottom = '0';
-      iframe.style.width = '0';
-      iframe.style.height = '0';
-      iframe.style.border = '0';
-      document.body.appendChild(iframe);
+      return clone;
+    }
 
-      const safeTitle = `${editableJudulAsesmen}_${currentMeta.mapel}_Kelas_${currentMeta.kelas}`.replace(/[^a-zA-Z0-9_-]+/g, '_');
+    function createPdfProgressOverlay(initialText = 'Menyusun dokumen PDF A4...') {
+      const existing = document.getElementById('pdf-progress-overlay');
+      if (existing) existing.remove();
+
+      const overlay = document.createElement('div');
+      overlay.id = 'pdf-progress-overlay';
+      overlay.className = 'no-print fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4';
+      overlay.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-6 max-w-sm w-full text-center space-y-3">
+          <div class="w-10 h-10 rounded-full border-4 border-slate-200 border-t-rose-700 animate-spin mx-auto"></div>
+          <div class="text-sm font-bold text-slate-900">Mengekspor Naskah ke PDF</div>
+          <div id="pdf-progress-text" class="text-xs text-slate-600">${escapeHtml(initialText)}</div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      return overlay;
+    }
+
+    async function waitImagesLoadedInElement(rootEl) {
+      const imgs = Array.from(rootEl.querySelectorAll('img'));
+      await Promise.all(imgs.map((img) => {
+        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+        return new Promise((resolve) => {
+          const timer = setTimeout(resolve, 2500);
+          img.onload = () => { clearTimeout(timer); resolve(); };
+          img.onerror = () => { clearTimeout(timer); resolve(); };
+        });
+      }));
+    }
+
+    function prepareSectionDomForPdf(sectionEl) {
+      const applyExactColWidths = (tableEl, widthsPx) => {
+        const totalWidth = widthsPx.reduce((sum, w) => sum + w, 0);
+        tableEl.style.width = `${totalWidth}px`;
+        tableEl.style.maxWidth = `${totalWidth}px`;
+        tableEl.style.tableLayout = 'fixed';
+        tableEl.style.borderCollapse = 'collapse';
+
+        let colgroup = tableEl.querySelector(':scope > colgroup');
+        if (!colgroup) {
+          colgroup = document.createElement('colgroup');
+          tableEl.insertBefore(colgroup, tableEl.firstChild);
+        }
+        colgroup.innerHTML = widthsPx.map((w) => `<col style="width: ${w}px;" />`).join('');
+
+        const directRows = [];
+        Array.from(tableEl.children).forEach((child) => {
+          if (child.tagName === 'TR') directRows.push(child);
+          else if (child.tagName === 'TBODY' || child.tagName === 'THEAD') {
+            directRows.push(...Array.from(child.children));
+          }
+        });
+
+        directRows.forEach((row) => {
+          if (row.cells.length === widthsPx.length) {
+            widthsPx.forEach((w, cIdx) => {
+              const cell = row.cells[cIdx];
+              cell.style.width = `${w}px`;
+              cell.style.minWidth = `${w}px`;
+              cell.style.maxWidth = `${w}px`;
+            });
+          }
+        });
+      };
+
+      sectionEl.querySelectorAll('.kop-header-table').forEach((kopTable) => {
+        applyExactColWidths(kopTable, [98, 504, 98]);
+        const doubleRule = document.createElement('div');
+        doubleRule.className = 'kop-double-rule';
+        kopTable.insertAdjacentElement('afterend', doubleRule);
+      });
+
+      sectionEl.querySelectorAll('.identitas-table').forEach((idTable) => {
+        applyExactColWidths(idTable, [118, 12, 226, 118, 12, 214]);
+      });
+
+      sectionEl.querySelectorAll('td').forEach((td) => {
+        if (td.children.length === 0 && td.textContent.trim() === '\u2610') {
+          td.innerHTML = '<span class="pdf-checkbox"></span>';
+          if (td.closest('.akm-grid-table')) {
+            td.classList.add('pdf-checkbox-cell');
+          } else {
+            td.style.textAlign = 'left';
+            td.style.verticalAlign = 'top';
+          }
+        }
+      });
+
+      sectionEl.querySelectorAll('.soal-table').forEach((tbl) => {
+        applyExactColWidths(tbl, [30, 670]);
+        const firstRow = tbl.rows[0];
+        if (firstRow && firstRow.cells.length >= 2) {
+          firstRow.cells[0].style.paddingRight = '4px';
+          firstRow.cells[0].style.whiteSpace = 'nowrap';
+          firstRow.cells[0].style.textAlign = 'left';
+          firstRow.cells[1].style.paddingLeft = '0';
+        }
+      });
+
+      sectionEl.querySelectorAll('.opsi-table').forEach((tbl) => {
+        const sampleRow = tbl.rows[0];
+        if (!sampleRow) return;
+        if (sampleRow.cells.length === 2) {
+          applyExactColWidths(tbl, [22, 648]);
+          Array.from(tbl.rows).forEach((row) => {
+            row.cells[0].style.whiteSpace = 'nowrap';
+            row.cells[0].style.paddingRight = '3px';
+          });
+        } else if (sampleRow.cells.length === 3) {
+          applyExactColWidths(tbl, [18, 22, 630]);
+          Array.from(tbl.rows).forEach((row) => {
+            row.cells[0].style.whiteSpace = 'nowrap';
+            row.cells[0].style.paddingRight = '2px';
+            row.cells[1].style.whiteSpace = 'nowrap';
+            row.cells[1].style.paddingRight = '3px';
+          });
+        }
+      });
+
+      sectionEl.querySelectorAll('.soal-table .akm-grid-table').forEach((tbl) => {
+        const headerRow = tbl.querySelector('thead tr');
+        const colCount = headerRow ? headerRow.cells.length : (tbl.rows[0]?.cells.length || 0);
+        if (colCount === 3) {
+          const secondHeader = (headerRow?.cells[1]?.textContent || '').trim();
+          if (/benar/i.test(secondHeader)) {
+            applyExactColWidths(tbl, [530, 70, 70]);
+          } else {
+            applyExactColWidths(tbl, [295, 80, 295]);
+          }
+        }
+      });
+
+      sectionEl.querySelectorAll('.pernyataan-inner-table').forEach((tbl) => {
+        applyExactColWidths(tbl, [20, 496]);
+        Array.from(tbl.rows).forEach((row) => {
+          row.cells[0].style.whiteSpace = 'nowrap';
+          row.cells[0].style.paddingRight = '3px';
+        });
+      });
+
+      sectionEl.querySelectorAll('div, p, li').forEach((el) => {
+        if (el.style.textAlign === 'justify') {
+          el.style.textAlign = 'left';
+        }
+      });
+
+      sectionEl.querySelectorAll('.soal-block img').forEach((img) => {
+        img.style.maxHeight = '200px';
+        img.style.maxWidth = '340px';
+      });
+    }
+
+    function paginateSectionIntoA4Pages(sectionEl, stagingHost, maxPageHeightPx) {
+      prepareSectionDomForPdf(sectionEl);
+
+      const pages = [];
+      let currentPage = null;
+
+      const startNewPage = () => {
+        if (currentPage && currentPage.parentNode === stagingHost) {
+          stagingHost.removeChild(currentPage);
+        }
+        const pageDiv = document.createElement('div');
+        pageDiv.className = 'pdf-page-sheet';
+        stagingHost.appendChild(pageDiv);
+        pages.push(pageDiv);
+        currentPage = pageDiv;
+        return pageDiv;
+      };
+
+      startNewPage();
+
+      const children = Array.from(sectionEl.children);
+      let idx = 0;
+
+      while (idx < children.length) {
+        const node = children[idx];
+
+        const isSplittableTable =
+          node.tagName === 'TABLE' &&
+          node.classList.contains('akm-grid-table') &&
+          !node.classList.contains('soal-block');
+
+        if (isSplittableTable) {
+          const tableClone = node.cloneNode(true);
+          currentPage.appendChild(tableClone);
+
+          if (currentPage.scrollHeight <= maxPageHeightPx) {
+            idx++;
+            continue;
+          }
+
+          currentPage.removeChild(tableClone);
+
+          const colgroup = node.querySelector('colgroup');
+          const thead = node.querySelector('thead');
+          const tbody = node.querySelector('tbody');
+          const bodyRows = tbody ? Array.from(tbody.children) : [];
+
+          const createTableShell = () => {
+            const t = document.createElement('table');
+            t.className = node.className;
+            t.style.cssText = node.style.cssText;
+            if (colgroup) t.appendChild(colgroup.cloneNode(true));
+            if (thead) t.appendChild(thead.cloneNode(true));
+            const tb = document.createElement('tbody');
+            t.appendChild(tb);
+            return { table: t, tbody: tb };
+          };
+
+          if (currentPage.children.length > 0 && maxPageHeightPx - currentPage.scrollHeight < 95) {
+            startNewPage();
+          }
+
+          let activeShell = createTableShell();
+          currentPage.appendChild(activeShell.table);
+
+          for (let r = 0; r < bodyRows.length; r++) {
+            const rowClone = bodyRows[r].cloneNode(true);
+            activeShell.tbody.appendChild(rowClone);
+
+            if (currentPage.scrollHeight > maxPageHeightPx) {
+              if (activeShell.tbody.children.length > 1) {
+                activeShell.tbody.removeChild(rowClone);
+                startNewPage();
+                activeShell = createTableShell();
+                currentPage.appendChild(activeShell.table);
+                activeShell.tbody.appendChild(rowClone);
+              } else if (currentPage.children.length > 1) {
+                currentPage.removeChild(activeShell.table);
+                startNewPage();
+                activeShell = createTableShell();
+                currentPage.appendChild(activeShell.table);
+                activeShell.tbody.appendChild(rowClone);
+              }
+            }
+          }
+
+          idx++;
+          continue;
+        }
+
+        const isSectionHeading =
+          node.tagName === 'DIV' &&
+          !node.classList.contains('soal-block') &&
+          !node.classList.contains('kop-double-rule') &&
+          /bold/i.test(node.style.fontWeight || '') &&
+          node.textContent.trim().length < 120;
+
+        if (isSectionHeading && currentPage.children.length > 0 && maxPageHeightPx - currentPage.scrollHeight < 155) {
+          startNewPage();
+        }
+
+        const nodeClone = node.cloneNode(true);
+        currentPage.appendChild(nodeClone);
+
+        if (currentPage.scrollHeight > maxPageHeightPx && currentPage.children.length > 1) {
+          currentPage.removeChild(nodeClone);
+          startNewPage();
+          currentPage.appendChild(nodeClone);
+        }
+
+        idx++;
+      }
+
+      if (currentPage && currentPage.parentNode === stagingHost) {
+        stagingHost.removeChild(currentPage);
+      }
+
+      return pages.filter((p) => p.children.length > 0);
+    }
+
+    async function downloadPdf() {
+      if (!currentGeneratedData || !currentMeta) {
+        showToast('Silakan buat paket soal terlebih dahulu sebelum mengunduh PDF.', 'error');
+        return;
+      }
+
+      if (currentTab === 'kuis' || currentTab === 'analisis') {
+        switchTab('semua');
+      }
+
+      const jsPDFConstructor = window.jspdf && window.jspdf.jsPDF;
+      if (typeof html2canvas === 'undefined' || !jsPDFConstructor) {
+        showToast('Pustaka PDF sedang tidak tersedia, membuka dialog cetak browser...', 'info');
+        printExam();
+        return;
+      }
+
+      const btnPdf = document.getElementById('btn-download-pdf');
+      const btnPdfLabel = document.getElementById('btn-download-pdf-label');
+      if (btnPdf) btnPdf.disabled = true;
+      if (btnPdfLabel) btnPdfLabel.textContent = 'Menyusun PDF...';
+
+      const overlay = createPdfProgressOverlay('Menyiapkan tata letak A4 dan gambar naskah...');
+      const setProgress = (txt) => {
+        const el = document.getElementById('pdf-progress-text');
+        if (el) el.textContent = txt;
+      };
+
+      let stagingWrapper = null;
+      const savedScrollX = window.scrollX;
+      const savedScrollY = window.scrollY;
+
+      try {
+        const clone = buildCleanExportClone(false);
+        if (!clone) throw new Error('Konten dokumen tidak ditemukan.');
+
+        const imgNodes = Array.from(clone.querySelectorAll('img'));
+        for (let i = 0; i < imgNodes.length; i++) {
+          const imgEl = imgNodes[i];
+          const src = imgEl.getAttribute('src') || '';
+          if (!src) {
+            imgEl.remove();
+            continue;
+          }
+          if (!src.startsWith('data:')) {
+            setProgress(`Memproses gambar ${i + 1} dari ${imgNodes.length}...`);
+            const converted = await convertImageToPngData(src);
+            if (converted && converted.base64) {
+              imgEl.setAttribute('src', `data:image/png;base64,${converted.base64}`);
+            } else {
+              imgEl.remove();
+            }
+          }
+        }
+
+        const rawSections = Array.from(clone.children).filter((child) => child.id && child.id.startsWith('doc-section-'));
+        const sectionsToRender = rawSections.length > 0 ? rawSections : [clone];
+
+        const marginLeftMm = 18;
+        const marginRightMm = 18;
+        const marginTopMm = 15;
+        const marginBottomMm = 18;
+        const printableWidthMm = 210 - marginLeftMm - marginRightMm;
+        const printableHeightMm = 297 - marginTopMm - marginBottomMm;
+        const pageWidthPx = 700;
+        const maxPageHeightPx = Math.floor(printableHeightMm * (pageWidthPx / printableWidthMm)) - 4;
+
+        window.scrollTo(0, 0);
+
+        stagingWrapper = document.createElement('div');
+        stagingWrapper.id = 'pdf-staging-wrapper';
+        stagingWrapper.style.position = 'absolute';
+        stagingWrapper.style.top = '0';
+        stagingWrapper.style.left = '0';
+        stagingWrapper.style.width = `${pageWidthPx}px`;
+        stagingWrapper.style.backgroundColor = '#ffffff';
+        stagingWrapper.style.zIndex = '9990';
+        stagingWrapper.style.pointerEvents = 'none';
+        document.body.appendChild(stagingWrapper);
+
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+
+        setProgress('Mengatur paginasi halaman A4...');
+        const allA4Pages = [];
+        for (let s = 0; s < sectionsToRender.length; s++) {
+          const secPages = paginateSectionIntoA4Pages(sectionsToRender[s], stagingWrapper, maxPageHeightPx);
+          allA4Pages.push(...secPages);
+        }
+
+        if (allA4Pages.length === 0) {
+          throw new Error('Tidak ada konten yang dapat diekspor ke PDF.');
+        }
+
+        const pdf = new jsPDFConstructor({
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait',
+          compress: true
+        });
+
+        const totalPages = allA4Pages.length;
+        const pdfPageWidth = pdf.internal.pageSize.getWidth();
+        const pdfPageHeight = pdf.internal.pageSize.getHeight();
+
+        for (let pIdx = 0; pIdx < totalPages; pIdx++) {
+          setProgress(`Merender halaman ${pIdx + 1} dari ${totalPages}...`);
+          const pageEl = allA4Pages[pIdx];
+
+          stagingWrapper.innerHTML = '';
+          stagingWrapper.appendChild(pageEl);
+          await waitImagesLoadedInElement(pageEl);
+          await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 40)));
+
+          const canvas = await html2canvas(pageEl, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: '#ffffff',
+            logging: false,
+            scrollX: 0,
+            scrollY: 0,
+            width: pageWidthPx,
+            windowWidth: pageWidthPx + 40
+          });
+
+          if (pIdx > 0) {
+            pdf.addPage();
+          }
+
+          const imgData = canvas.toDataURL('image/png');
+          const naturalHeightMm = (canvas.height * printableWidthMm) / canvas.width;
+          const renderHeightMm = Math.min(naturalHeightMm, printableHeightMm);
+          const renderWidthMm = naturalHeightMm > printableHeightMm
+            ? (printableWidthMm * (printableHeightMm / naturalHeightMm))
+            : printableWidthMm;
+
+          pdf.addImage(imgData, 'PNG', marginLeftMm, marginTopMm, renderWidthMm, renderHeightMm, undefined, 'FAST');
+
+          pdf.setDrawColor(203, 213, 225);
+          pdf.setLineWidth(0.25);
+          pdf.line(marginLeftMm, pdfPageHeight - 12.5, pdfPageWidth - marginRightMm, pdfPageHeight - 12.5);
+
+          pdf.setFont('times', 'italic');
+          pdf.setFontSize(8.5);
+          pdf.setTextColor(71, 85, 105);
+          pdf.text(
+            `SMP Negeri 3 Besuki — ${currentMeta.mapel} Kelas ${currentMeta.kelas}`,
+            marginLeftMm,
+            pdfPageHeight - 8.5
+          );
+          pdf.text(
+            `Halaman ${pIdx + 1} dari ${totalPages}`,
+            pdfPageWidth - marginRightMm,
+            pdfPageHeight - 8.5,
+            { align: 'right' }
+          );
+        }
+
+        const tabSuffixMap = {
+          semua: 'Paket_Lengkap',
+          naskah: 'Naskah_Soal',
+          kunci: 'Kunci_Jawaban',
+          kisikisi: 'Kisi_Kisi_Kartu'
+        };
+        const tabLabel = tabSuffixMap[currentTab] || 'Paket_Soal';
+        const safeMapel = currentMeta.mapel.replace(/[^a-zA-Z0-9]+/g, '_');
+        const filename = `${tabLabel}_${safeMapel}_Kelas_${currentMeta.kelas}_SMPN3_Besuki.pdf`;
+
+        setProgress('Menyimpan file PDF...');
+        pdf.save(filename);
+        showToast(`File PDF "${filename}" (${totalPages} halaman) berhasil diunduh.`, 'success');
+      } catch (err) {
+        console.error('Gagal membuat PDF:', err);
+        showToast('Gagal membuat PDF otomatis. Mencoba membuka dialog cetak browser...', 'error');
+        printExam();
+      } finally {
+        if (stagingWrapper && stagingWrapper.parentNode) {
+          stagingWrapper.parentNode.removeChild(stagingWrapper);
+        }
+        if (overlay && overlay.parentNode) {
+          overlay.parentNode.removeChild(overlay);
+        }
+        window.scrollTo(savedScrollX, savedScrollY);
+        if (btnPdf) btnPdf.disabled = false;
+        if (btnPdfLabel) btnPdfLabel.textContent = 'Unduh PDF (.pdf)';
+      }
+    }
+
+    function printExam() {
+      if (!currentGeneratedData || !currentMeta) {
+        showToast('Silakan buat paket soal terlebih dahulu sebelum mencetak.', 'error');
+        return;
+      }
+
+      if (currentTab === 'kuis' || currentTab === 'analisis') {
+        switchTab('semua');
+      }
+
+      const clone = buildCleanExportClone(true);
+      if (!clone) {
+        showToast('Naskah soal belum tersedia untuk dicetak.', 'error');
+        return;
+      }
+
+      const safeMapel = currentMeta.mapel.replace(/[^a-zA-Z0-9]+/g, '_');
+      const docTitle = `Naskah_${safeMapel}_Kelas_${currentMeta.kelas}_SMPN3_Besuki`;
+
       const printHtml = `<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>${escapeHtml(safeTitle)}</title>
+  <title>${escapeHtml(docTitle)}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
   <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
     @page {
@@ -3280,15 +3899,18 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
       margin: 0;
       padding: 0;
       background: #ffffff;
+      font-family: 'Times New Roman', Times, serif;
       color: #0f172a;
-      font-family: "Times New Roman", Times, serif;
-      font-size: 11pt;
       line-height: 1.5;
+      font-size: 11pt;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
+    .hidden, .no-print {
+      display: none !important;
+    }
     .arabic-text {
-      font-family: "Amiri", "Traditional Arabic", serif;
+      font-family: 'Amiri', 'Traditional Arabic', 'Scheherazade New', serif;
       direction: rtl;
       unicode-bidi: isolate;
       font-size: 1.45rem;
@@ -3355,6 +3977,7 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
       background-color: #f1f5f9;
       font-weight: bold;
       text-align: center;
+      vertical-align: middle;
     }
     .pernyataan-inner-table {
       width: 100%;
@@ -3369,6 +3992,9 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
     .page-break-before {
       page-break-before: always;
       break-before: page;
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+      border-top: none !important;
     }
     .soal-block {
       page-break-inside: avoid;
@@ -3376,7 +4002,6 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
     }
     img {
       max-width: 100%;
-      page-break-inside: avoid;
     }
   </style>
 </head>
@@ -3385,35 +4010,51 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
 </body>
 </html>`;
 
-      const frameWin = iframe.contentWindow;
-      const frameDoc = frameWin?.document;
-      if (!frameDoc) {
-        window.print();
+      const printWin = window.open('', '_blank', 'width=900,height=700');
+      if (printWin) {
+        printWin.document.open();
+        printWin.document.write(printHtml);
+        printWin.document.close();
+        printWin.focus();
+        setTimeout(() => {
+          try {
+            printWin.print();
+          } catch (e) {}
+        }, 450);
+        showToast('Membuka jendela cetak... Jika dialog tidak muncul, gunakan tombol "Unduh PDF (.pdf)".', 'info');
         return;
       }
 
-      showToast('Menyiapkan lembar cetak A4 — pilih "Save as PDF" pada dialog cetak.', 'info');
+      const existingFrame = document.getElementById('hidden-print-frame');
+      if (existingFrame) existingFrame.remove();
+
+      const iframe = document.createElement('iframe');
+      iframe.id = 'hidden-print-frame';
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '1px';
+      iframe.style.height = '1px';
+      iframe.style.border = '0';
+      iframe.style.opacity = '0';
+      document.body.appendChild(iframe);
+
+      const frameWin = iframe.contentWindow;
+      const frameDoc = frameWin.document;
       frameDoc.open();
       frameDoc.write(printHtml);
       frameDoc.close();
 
-      let printed = false;
-      const triggerFramePrint = () => {
-        if (printed) return;
-        printed = true;
+      showToast('Membuka dialog Cetak... Untuk simpan PDF langsung, gunakan tombol "Unduh PDF (.pdf)".', 'info');
+
+      setTimeout(() => {
         try {
           frameWin.focus();
           frameWin.print();
         } catch (err) {
           window.print();
         }
-        setTimeout(() => {
-          if (iframe.parentNode) iframe.remove();
-        }, 2000);
-      };
-
-      iframe.onload = () => setTimeout(triggerFramePrint, 350);
-      setTimeout(triggerFramePrint, 900);
+      }, 450);
     }
 
     function copyPlainText() {
@@ -3426,6 +4067,9 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
       }
     }
 
+    /* ==========================================================================
+       9. KONVERSI GAMBAR & EKSPOR MICROSOFT WORD (.DOC)
+       ========================================================================== */
     async function convertImageToPngData(src) {
       return await new Promise((resolve) => {
         if (!src) {
@@ -3434,7 +4078,9 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
         }
         const img = new Image();
         img.crossOrigin = 'anonymous';
+        const timeoutId = setTimeout(() => resolve(null), 5000);
         img.onload = () => {
+          clearTimeout(timeoutId);
           try {
             const natW = img.naturalWidth || 120;
             const natH = img.naturalHeight || 120;
@@ -3460,6 +4106,7 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
           }
         };
         img.onerror = () => {
+          clearTimeout(timeoutId);
           if (src.startsWith('data:image/')) {
             const base64 = src.split(',')[1] || '';
             resolve({ base64, width: 140, height: 140 });
@@ -3476,27 +4123,103 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
       wrapper.innerHTML = rawSectionHtml;
 
       wrapper.querySelectorAll('.no-print').forEach((el) => el.remove());
+
+      const applyWordColWidthsCm = (tableEl, widthsCm) => {
+        const totalCm = widthsCm.reduce((sum, w) => sum + w, 0);
+        tableEl.setAttribute('width', `${totalCm.toFixed(2)}cm`);
+        tableEl.style.width = `${totalCm.toFixed(2)}cm`;
+        tableEl.style.borderCollapse = 'collapse';
+        tableEl.style.tableLayout = 'fixed';
+        tableEl.style.msoTableLspace = '0pt';
+        tableEl.style.msoTableRspace = '0pt';
+
+        let colgroup = tableEl.querySelector(':scope > colgroup');
+        if (!colgroup) {
+          colgroup = document.createElement('colgroup');
+          tableEl.insertBefore(colgroup, tableEl.firstChild);
+        }
+        colgroup.innerHTML = widthsCm.map((w) => `<col width="${w}cm" style="width: ${w}cm;" />`).join('');
+
+        const directRows = [];
+        Array.from(tableEl.children).forEach((child) => {
+          if (child.tagName === 'TR') directRows.push(child);
+          else if (child.tagName === 'TBODY' || child.tagName === 'THEAD') {
+            directRows.push(...Array.from(child.children));
+          }
+        });
+
+        directRows.forEach((row) => {
+          if (row.cells.length === widthsCm.length) {
+            widthsCm.forEach((w, cIdx) => {
+              row.cells[cIdx].setAttribute('width', `${w}cm`);
+              row.cells[cIdx].style.width = `${w}cm`;
+            });
+          }
+        });
+      };
+
       wrapper.querySelectorAll('table').forEach((table) => {
-        table.setAttribute('width', '100%');
         table.setAttribute('border', table.classList.contains('akm-grid-table') ? '1' : '0');
         table.setAttribute('cellspacing', '0');
         table.setAttribute('cellpadding', '0');
-        table.style.width = '100%';
         table.style.borderCollapse = 'collapse';
         table.style.tableLayout = 'fixed';
         table.style.msoTableLspace = '0pt';
         table.style.msoTableRspace = '0pt';
       });
-      wrapper.querySelectorAll('colgroup col').forEach((col) => {
-        const cssWidth = (col.style.width || '').trim();
-        if (cssWidth) {
-          col.setAttribute('width', cssWidth);
-          col.style.width = cssWidth;
+
+      wrapper.querySelectorAll('td').forEach((td) => {
+        if (td.children.length === 0 && td.textContent.trim() === '\u2610') {
+          td.innerHTML = '<span style="font-family: \'Segoe UI Symbol\', \'DejaVu Sans\', sans-serif; font-size: 11pt; line-height: 1;">&#9744;</span>';
+          if (td.closest('.akm-grid-table')) {
+            td.style.textAlign = 'center';
+            td.style.verticalAlign = 'middle';
+          }
         }
       });
-      wrapper.querySelectorAll('.soal-table > tbody > tr > td:first-child, .soal-table > tr > td:first-child').forEach((td) => {
-        td.style.width = '0.75cm';
-        td.style.whiteSpace = 'nowrap';
+
+      wrapper.querySelectorAll('.kop-header-table').forEach((tbl) => {
+        applyWordColWidthsCm(tbl, [2.4, 12.6, 2.4]);
+      });
+
+      wrapper.querySelectorAll('.identitas-table').forEach((tbl) => {
+        applyWordColWidthsCm(tbl, [3.0, 0.35, 5.55, 3.0, 0.35, 5.15]);
+      });
+
+      wrapper.querySelectorAll('.soal-table').forEach((tbl) => {
+        applyWordColWidthsCm(tbl, [0.8, 16.6]);
+        const firstRow = tbl.rows[0];
+        if (firstRow && firstRow.cells.length >= 2) {
+          firstRow.cells[0].style.whiteSpace = 'nowrap';
+          firstRow.cells[0].style.paddingRight = '2pt';
+        }
+      });
+
+      wrapper.querySelectorAll('.opsi-table').forEach((tbl) => {
+        const sampleRow = tbl.rows[0];
+        if (!sampleRow) return;
+        if (sampleRow.cells.length === 2) {
+          applyWordColWidthsCm(tbl, [0.65, 15.95]);
+        } else if (sampleRow.cells.length === 3) {
+          applyWordColWidthsCm(tbl, [0.55, 0.65, 15.4]);
+        }
+      });
+
+      wrapper.querySelectorAll('.soal-table .akm-grid-table').forEach((tbl) => {
+        const headerRow = tbl.querySelector('thead tr');
+        const colCount = headerRow ? headerRow.cells.length : (tbl.rows[0]?.cells.length || 0);
+        if (colCount === 3) {
+          const secondHeader = (headerRow?.cells[1]?.textContent || '').trim();
+          if (/benar/i.test(secondHeader)) {
+            applyWordColWidthsCm(tbl, [12.8, 1.9, 1.9]);
+          } else {
+            applyWordColWidthsCm(tbl, [7.3, 2.0, 7.3]);
+          }
+        }
+      });
+
+      wrapper.querySelectorAll('.pernyataan-inner-table').forEach((tbl) => {
+        applyWordColWidthsCm(tbl, [0.6, 11.7]);
       });
 
       const imgNodes = Array.from(wrapper.querySelectorAll('img'));
@@ -3614,139 +4337,159 @@ Isi field "gambar_kata_kunci" dengan deskripsi objek gambar konkret dalam bahasa
     font-weight: bold;
     text-align: center;
   }
+  .pernyataan-inner-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .pernyataan-inner-table td {
+    border: none !important;
+    padding: 0 !important;
+    vertical-align: top;
+  }
 </style>
 </head>
 <body>
 <div class="Section1">
 ${wrapper.innerHTML}
-<div style="margin-top: 14pt; padding-top: 6pt; border-top: 1px solid #cbd5e1; font-size: 8.5pt; color: #475569; text-align: right;">
-  Sumber Referensi Penyusunan (Gemini): <a href="${GEMINI_SHARE_REFERENCE_URL}" target="_blank" style="color: #1e3a8a; text-decoration: underline;">${GEMINI_SHARE_REFERENCE_URL}</a>
-</div>
 </div>
 </body>
 </html>`;
 
-      const boundary = '----=_NextPart_SMPN3_BESUKI_WORD_001';
-      let mhtml = `MIME-Version: 1.0\r\nContent-Type: multipart/related; boundary="${boundary}"\r\n\r\n`;
-      mhtml += `--${boundary}\r\nContent-Type: text/html; charset="utf-8"\r\nContent-Transfer-Encoding: 8bit\r\n\r\n${fullHtml}\r\n\r\n`;
+      const boundary = '----=_NextPart_SMPN3_BESUKI_01D9A8F0';
+      let mhtml = '';
+      mhtml += 'MIME-Version: 1.0\r\n';
+      mhtml += `Content-Type: multipart/related; boundary="${boundary}"\r\n\r\n`;
+      mhtml += `--${boundary}\r\n`;
+      mhtml += 'Content-Type: text/html; charset="utf-8"\r\n';
+      mhtml += 'Content-Transfer-Encoding: 8bit\r\n\r\n';
+      mhtml += fullHtml + '\r\n\r\n';
 
       mhtmlParts.forEach((part) => {
-        const chunked = part.base64.match(/.{1,76}/g)?.join('\r\n') || part.base64;
-        mhtml += `--${boundary}\r\nContent-Type: image/png\r\nContent-Transfer-Encoding: base64\r\nContent-Location: ${part.location}\r\n\r\n${chunked}\r\n\r\n`;
+        const wrappedB64 = part.base64.replace(/.{1,76}/g, '$&\r\n');
+        mhtml += `--${boundary}\r\n`;
+        mhtml += 'Content-Type: image/png\r\n';
+        mhtml += 'Content-Transfer-Encoding: base64\r\n';
+        mhtml += `Content-Location: ${part.location}\r\n\r\n`;
+        mhtml += wrappedB64 + '\r\n';
       });
 
-      mhtml += `--${boundary}--`;
+      mhtml += `--${boundary}--\r\n`;
       return mhtml;
     }
 
-    async function downloadWordPart(part) {
+    async function downloadWordPart(partName) {
       if (!currentGeneratedData || !currentMeta) {
-        showToast('Silakan buat paket soal terlebih dahulu.', 'error');
+        showToast('Silakan buat paket soal terlebih dahulu sebelum mengunduh file Word.', 'error');
         return;
       }
 
       const sectionMap = {
-        soal: { id: 'doc-section-naskah', label: 'Naskah_Soal' },
-        kunci: { id: 'doc-section-kunci', label: 'Kunci_Jawaban' },
-        kisikisi: { id: 'doc-section-kisikisi', label: 'Kisi_Kisi_dan_Kartu_Soal' }
+        soal: {
+          elId: 'doc-section-naskah',
+          prefix: 'Naskah_Soal',
+          label: 'Naskah Soal'
+        },
+        kunci: {
+          elId: 'doc-section-kunci',
+          prefix: 'Kunci_Jawaban_Rubrik',
+          label: 'Kunci Jawaban & Rubrik'
+        },
+        kisikisi: {
+          elId: 'doc-section-kisikisi',
+          prefix: 'Kisi_Kisi_Kartu_Soal',
+          label: 'Kisi-Kisi & Kartu Soal'
+        }
       };
 
-      const target = sectionMap[part];
-      const el = target ? document.getElementById(target.id) : null;
-      if (!el) return;
+      const cfg = sectionMap[partName];
+      const targetEl = cfg ? document.getElementById(cfg.elId) : null;
+      if (!targetEl) {
+        showToast('Bagian dokumen tidak ditemukan.', 'error');
+        return;
+      }
 
-      showToast(`Menyiapkan dokumen Word (${target.label})...`, 'info');
-      const mhtmlContent = await buildMhtmlWordDocument(target.label, el.innerHTML);
-      const blob = new Blob([mhtmlContent], { type: 'application/msword;charset=utf-8' });
+      showToast(`Menyusun file Microsoft Word (${cfg.label})...`, 'info');
       const safeMapel = currentMeta.mapel.replace(/[^a-zA-Z0-9]+/g, '_');
-      const filename = `${target.label}_${safeMapel}_Kelas_${currentMeta.kelas}_SMPN3_Besuki.doc`;
+      const filename = `${cfg.prefix}_${safeMapel}_Kelas_${currentMeta.kelas}_SMPN3_Besuki.doc`;
 
+      const mhtmlContent = await buildMhtmlWordDocument(filename, targetEl.innerHTML);
+      const blob = new Blob(['\ufeff', mhtmlContent], { type: 'application/msword;charset=utf-8' });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showToast(`File ${filename} berhasil diunduh.`, 'success');
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      showToast(`File "${filename}" berhasil diunduh.`, 'success');
     }
 
     function copyTextToClipboard(text) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.select();
-      let success = false;
       try {
-        success = document.execCommand('copy');
-      } catch (e) {}
-      document.body.removeChild(ta);
-      return success;
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
     }
 
     /* ==========================================================================
-       7. INISIALISASI EVENT LISTENER SAAT HALAMAN SIAP
+       10. INISIALISASI EVENT LISTENER SAAT HALAMAN SIAP
        ========================================================================== */
     document.addEventListener('DOMContentLoaded', () => {
-      const form = document.getElementById('soal-form');
+      loadSavedLogos();
+      updateTotalBadge();
+
       const mapelSelect = document.getElementById('mapel-select');
       const mapelCustom = document.getElementById('mapel-custom');
-      const btnResetForm = document.getElementById('btn-reset-form');
-
-      if (form) {
-        form.addEventListener('submit', handleGenerateSoal);
-      }
-
-      if (mapelSelect && mapelCustom) {
-        mapelSelect.addEventListener('change', () => {
-          if (mapelSelect.value === '__CUSTOM__') {
-            mapelCustom.classList.remove('hidden');
-            mapelCustom.focus();
-          } else {
-            mapelCustom.classList.add('hidden');
-          }
-        });
-      }
-
-      if (btnResetForm) {
-        btnResetForm.addEventListener('click', resetAllWorkspace);
-      }
+      mapelSelect?.addEventListener('change', () => {
+        if (mapelSelect.value === '__CUSTOM__') {
+          mapelCustom?.classList.remove('hidden');
+          mapelCustom?.focus();
+        } else {
+          mapelCustom?.classList.add('hidden');
+        }
+      });
 
       ['jml-pg-sederhana', 'jml-pg-kompleks', 'jml-benar-salah', 'jml-menjodohkan', 'jml-esai'].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('input', updateTotalBadge);
+        document.getElementById(id)?.addEventListener('input', updateTotalBadge);
       });
 
+      document.getElementById('soal-form')?.addEventListener('submit', handleGenerateSoal);
+
+      document.getElementById('btn-reset-form')?.addEventListener('click', resetAllWorkspace);
+
       document.getElementById('input-logo-pemkab')?.addEventListener('change', (e) => {
-        handleLogoFileUpload('pemkab', e.target.files?.[0]);
-      });
-      document.getElementById('url-logo-pemkab')?.addEventListener('change', (e) => {
-        saveLogoToStorage('pemkab', e.target.value.trim());
+        handleLogoFileUpload('pemkab', e.target?.files?.[0]);
       });
       document.getElementById('btn-clear-logo-pemkab')?.addEventListener('click', () => {
-        const urlEl = document.getElementById('url-logo-pemkab');
-        if (urlEl) urlEl.value = '';
         saveLogoToStorage('pemkab', '');
+      });
+      document.getElementById('url-logo-pemkab')?.addEventListener('change', (e) => {
+        const val = (e.target?.value || '').trim();
+        if (val) saveLogoToStorage('pemkab', val);
       });
 
       document.getElementById('input-logo-sekolah')?.addEventListener('change', (e) => {
-        handleLogoFileUpload('sekolah', e.target.files?.[0]);
-      });
-      document.getElementById('url-logo-sekolah')?.addEventListener('change', (e) => {
-        saveLogoToStorage('sekolah', e.target.value.trim());
+        handleLogoFileUpload('sekolah', e.target?.files?.[0]);
       });
       document.getElementById('btn-clear-logo-sekolah')?.addEventListener('click', () => {
-        const urlEl = document.getElementById('url-logo-sekolah');
-        if (urlEl) urlEl.value = '';
         saveLogoToStorage('sekolah', '');
       });
-
-      updateTotalBadge();
-      loadSavedLogos();
+      document.getElementById('url-logo-sekolah')?.addEventListener('change', (e) => {
+        const val = (e.target?.value || '').trim();
+        if (val) saveLogoToStorage('sekolah', val);
+      });
     });
   </script>
-
 </body></html>
